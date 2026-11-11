@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Reyaan Trip Holiday — Website
 
-## Getting Started
+Cinematic marketing site for **Reyaan Trip Holiday** (Srinagar · Kashmir · Ladakh · Katra · Jammu).
+Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · React Three Fiber globe · GSAP + Lenis scroll.
 
-First, run the development server:
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # production build
+npm start          # serve the production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Edit content (no code knowledge needed)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| What | File |
+|---|---|
+| Phone numbers, emails, addresses, WhatsApp number, domain | `src/data/site.ts` |
+| Destinations (text, highlights, photos) | `src/data/destinations.ts` |
+| Tour packages, **prices**, itineraries | `src/data/packages.ts` |
+| Why-us points, vehicles, testimonials, FAQs | `src/data/content.ts` |
+| Photos | `public/images/destinations/` |
+| Logo / banner | `public/brand/` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Before going live:** confirm package prices in `packages.ts` (they are placeholders), replace the
+sample testimonials in `content.ts` with real guest reviews, and set the real domain in `site.ts`.
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full folder structure, design tokens and conventions.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/app/            routes: / · /destinations · /destinations/[slug] · /packages · /packages/[slug] · /about · /contact
+src/components/     ui · layout · home · three · destinations · packages · contact · shared · seo
+src/data/           all site content
+src/lib/            helpers (WhatsApp links, INR formatting, geo maths, globe state)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy
 
-## Deploy on Vercel
+Works on Vercel out of the box (`vercel` or import the repo), or any Node host via `npm run build && npm start`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Photography: Unsplash (free licence). Earth textures: NASA Blue Marble via three-globe examples.

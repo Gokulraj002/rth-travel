@@ -74,9 +74,9 @@ export const destinations: Destination[] = [
     altitudeM: 2740,
     bestTime: "April – October",
     distanceNote: "≈ 95 km · 2.5 – 3 hrs from Srinagar",
-    highlights: ["Betaab Valley", "Aru Valley", "Chandanwari", "Baisaran meadows", "Lidder river"],
+    highlights: ["Betaab Valley", "Aru Valley", "Chandanwari", "Lidder river", "Pine-forest walks"],
     thingsToDo: [
-      "Pony ride to Baisaran — 'Mini Switzerland'",
+      "Explore Aru Valley's meadows and pony trails",
       "Picnic in Betaab Valley",
       "Trout fishing on the Lidder",
       "River rafting (seasonal)",

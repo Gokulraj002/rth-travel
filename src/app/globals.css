@@ -1,28 +1,64 @@
 @import "tailwindcss";
 
 /*
- * Reyaan Trip Holiday — design tokens
- * Night-sky canvas (inspired by the cinematic globe reference), brand navy/sky
- * from the RTH logo, and saffron-gold from the banner as the single accent.
- * Use these tokens via Tailwind utilities: bg-night, text-gold, border-line, etc.
+ * Reyaan Trip Holiday — design tokens (light, premium)
+ * Every colour comes from the RTH logo: navy #003060, blue #005490, light blue #84a8cc, leaf #3ca830.
+ *
+ * Two scopes share the SAME token names, so components never hard-code a theme:
+ *   :root        → light pages (default)
+ *   .theme-dark  → immersive dark navy sections (globe journey, cinematic reveal, photo heroes, footer)
+ * Token names are historical: `night` = the page/section background in either scope.
+ * `scrim` is ALWAYS dark navy — use it for gradients over photos that carry white text.
  */
 :root {
-  --night: #04060d; /* page background */
-  --night-2: #080c18; /* raised sections */
-  --surface: #0e1424; /* cards */
-  --surface-2: #141c31; /* hovered cards / inputs */
-  --line: rgb(255 255 255 / 0.09);
-  --line-strong: rgb(255 255 255 / 0.18);
-  --ink: #f4f6fb; /* primary text */
-  --muted: #9aa5bd; /* secondary text */
-  --faint: #5d6880; /* tertiary text / labels */
-  --brand: #1f5fbf; /* RTH logo blue */
-  --brand-deep: #0c2f6b; /* RTH logo navy */
-  --sky: #7fb2ff; /* light brand blue */
-  --gold: #f6b628; /* banner saffron — primary CTA */
-  --gold-soft: #ffd77a;
-  --leaf: #4cb944; /* logo leaf — success / eco accents */
+  --night: #f6f8fb; /* page background — cool off-white */
+  --night-2: #edf2f8; /* alternate section background */
+  --surface: #ffffff; /* cards */
+  --surface-2: #f1f5fa; /* inputs, hovered rows */
+  --line: rgb(0 48 96 / 0.1); /* logo-navy hairlines */
+  --line-strong: rgb(0 48 96 / 0.18);
+  --ink: #0c1f3b; /* primary text — deep logo navy */
+  --muted: #4b5d78; /* secondary text */
+  --faint: #5f6f88; /* labels (≥4.5:1 on the page background) */
+  --brand: #005490; /* RTH logo blue (exact) */
+  --brand-deep: #003060; /* RTH logo navy (exact) */
+  --sky: #84a8cc; /* RTH logo swoosh light blue (exact) */
+  --primary: #005490; /* solid CTAs — exact logo blue, white text (7.4:1) */
+  --primary-bright: #0a6aad; /* CTA hover */
+  --accent: #0a63a6; /* highlighted words, eyebrows, active states */
+  --accent-soft: #84a8cc; /* decorative tints */
+  --leaf: #267a1e; /* logo green, deepened so small text passes 4.5:1 on white/off-white */
+  --leaf-deep: #3ca830; /* RTH logo green (exact) */
+  --scrim: #020b1a; /* always-dark photo overlay */
+  --glass-bg: rgb(255 255 255 / 0.78);
+  --shadow-rgb: 0 48 96;
   --atmosphere: #4f8dff; /* globe glow */
+  --header-h: 64px; /* sticky site header height (see Navbar) */
+}
+@media (min-width: 1024px) {
+  :root { --header-h: 76px; }
+}
+
+/* Immersive dark navy scope — wrap a section in `theme-dark` and every token flips. */
+.theme-dark {
+  --night: #020b1a;
+  --night-2: #061430;
+  --surface: #0b1c3a;
+  --surface-2: #11264c;
+  --line: rgb(132 168 204 / 0.14);
+  --line-strong: rgb(132 168 204 / 0.28);
+  --ink: #f3f7fd;
+  --muted: #a3b5ce;
+  --faint: #8a9cbb;
+  --primary: #0f6cbd;
+  --primary-bright: #2484d6;
+  --accent: #7cc0ff;
+  --accent-soft: #b8ddff;
+  --leaf: #4cc13d;
+  --glass-bg: rgb(2 11 26 / 0.6);
+  --shadow-rgb: 0 0 0;
+  color-scheme: dark;
+  color: var(--ink);
 }
 
 @theme inline {
@@ -38,13 +74,22 @@
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
   --color-sky: var(--sky);
-  --color-gold: var(--gold);
-  --color-gold-soft: var(--gold-soft);
+  --color-primary: var(--primary);
+  --color-primary-bright: var(--primary-bright);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
   --color-leaf: var(--leaf);
+  --color-leaf-deep: var(--leaf-deep);
+  --color-scrim: var(--scrim);
 
-  --font-sans: var(--font-body);
-  --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
+  --shadow-soft: 0 1px 2px rgb(var(--shadow-rgb) / 0.05), 0 10px 30px -12px rgb(var(--shadow-rgb) / 0.14);
+  --shadow-lift: 0 2px 4px rgb(var(--shadow-rgb) / 0.06), 0 22px 48px -18px rgb(var(--shadow-rgb) / 0.24);
+
+  /* "RTH Rupee" only covers ₹ (U+20B9) — see the @font-face below. */
+  --font-sans: "RTH Rupee", var(--font-body);
+  --font-display: "RTH Rupee", var(--font-display);
+  /* No monospace webfont: numbers/labels use the body font with tabular figures (see `label`). */
+  --font-mono: "RTH Rupee", var(--font-body), system-ui, sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -70,8 +115,23 @@
   to { background-position-x: -200%; }
 }
 
+/*
+ * ₹ comes from the device's own system font. Without this, the single ₹ glyph in prices
+ * made the browser download Unbounded/Manrope's whole "latin-ext" file (≈117 KB on the home page).
+ * unicode-range limits this face to ₹ only, so every other character still uses the brand fonts.
+ */
+@font-face {
+  font-family: "RTH Rupee";
+  src: local("SF Pro Text"), local(".SFNS-Regular"), local("Helvetica Neue"), local("HelveticaNeue"),
+    local("Roboto"), local("Roboto-Regular"), local("Segoe UI"), local("SegoeUI"), local("Arial"),
+    local("ArialMT"), local("Noto Sans"), local("NotoSans-Regular");
+  unicode-range: U+20B9;
+  font-display: swap;
+}
+
 html {
-  color-scheme: dark;
+  color-scheme: light;
+  scroll-padding-top: var(--header-h);
   background: var(--night);
   -webkit-text-size-adjust: 100%;
 }
@@ -79,15 +139,15 @@ html {
 body {
   background: var(--night);
   color: var(--ink);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: "RTH Rupee", var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--gold);
-  color: var(--night);
+  background: var(--primary);
+  color: #fff;
 }
 
 /* Lenis smooth scroll */
@@ -97,18 +157,27 @@ html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
 
-/* Small uppercase mono labels used throughout (e.g. "LOCAL TIME", "01 — KASHMIR") */
+/* Small uppercase labels used throughout (e.g. "LOCAL TIME", "01 — KASHMIR") */
 @utility label {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--font-body), system-ui, sans-serif;
   font-size: 0.6875rem;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
   color: var(--faint);
 }
 
-/* Frosted glass panel used for overlays on the globe / photos */
+/* Skip layout/paint of far-below-the-fold sections until they approach the viewport.
+   contain-intrinsic-size `auto` remembers the real height after first render (no scroll jumps). */
+@utility cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1100px;
+}
+
+/* Frosted glass panel — light in light scope, navy inside .theme-dark */
 @utility glass {
-  background: rgb(10 14 26 / 0.55);
+  background: var(--glass-bg);
   border: 1px solid var(--line);
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
@@ -126,7 +195,7 @@ html.lenis body { height: auto; }
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 6px;
 }

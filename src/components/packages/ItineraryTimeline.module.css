@@ -1,0 +1,57 @@
+/*
+ * Itinerary timeline — scroll-driven with zero JS.
+ * Static fallback (no `animation-timeline` support, e.g. Firefox, or prefers-reduced-motion):
+ * the progress line is fully drawn and every day is visible.
+ * Only `transform` / `opacity` animate (compositor-only).
+ */
+
+.fill {
+  transform-origin: top;
+  transform: scaleY(1);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Fills from when the list's top reaches 70% of the viewport until its end reaches 55%. */
+    .fill {
+      /* Longhands: the `animation` shorthand would reset animation-timeline. */
+      animation-name: itinerary-fill;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: cover 30vh cover calc(100% - 55vh);
+    }
+
+    /* Each day rises in as it enters the viewport. */
+    .day {
+      /* Longhands: the `animation` shorthand would reset animation-timeline. */
+      animation-name: itinerary-rise;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@keyframes itinerary-fill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes itinerary-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

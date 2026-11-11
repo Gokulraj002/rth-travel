@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Unbounded, Manrope, JetBrains_Mono } from "next/font/google";
+import { Playfair_Display, Manrope } from "next/font/google";
 import { site } from "@/data/site";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -8,21 +8,23 @@ import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { JsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
 
-const display = Unbounded({
+// Premium pairing: Playfair Display (high-contrast serif) for headings, Manrope for UI/body.
+// Both are variable fonts — omitting `weight` loads one latin woff2 per family with the full weight axis.
+// Labels/numbers use Manrope with tabular figures (no monospace webfont — see globals.css).
+const display = Playfair_Display({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["500", "700", "800", "900"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const body = Manrope({
   variable: "--font-body",
   subsets: ["latin"],
-});
-
-const mono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -47,20 +49,21 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    images: [{ url: "/images/destinations/srinagar.jpg", width: 1600, height: 1067 }],
+    images: [{ url: "/brand/og-default.jpg", width: 1200, height: 630, alt: site.name }],
     locale: "en_IN",
   },
   twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#04060d",
-  colorScheme: "dark",
+  themeColor: "#ffffff",
+  colorScheme: "light",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={`${display.variable} ${body.variable} ${mono.variable} antialiased`}>
+    <html lang="en-IN" className={`${display.variable} ${body.variable} antialiased`}>
       <body className="min-h-dvh bg-night text-ink">
         <JsonLd />
         <SmoothScroll />

@@ -72,7 +72,7 @@ export function PageHero({
 
       <Container className="relative pt-16 pb-16 sm:pt-20 sm:pb-20">
         {crumbs.length > 0 && (
-          <p className="label mb-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-white/80">
+          <p className="label mb-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.75rem] text-white/85 [text-shadow:0_1px_10px_rgb(2_11_26/0.85)]">
             <span aria-hidden className="h-px w-8 bg-accent" />
             {crumbs.map((c, i) => (
               <span key={`${c}-${i}`} className="flex items-center gap-2.5">
@@ -81,7 +81,7 @@ export function PageHero({
                     /
                   </span>
                 )}
-                <span className={i === crumbs.length - 1 ? "text-accent" : undefined}>{c}</span>
+                <span className={i === crumbs.length - 1 ? "text-white" : undefined}>{c}</span>
               </span>
             ))}
           </p>

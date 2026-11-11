@@ -53,7 +53,7 @@ export function DestinationCard({
   index?: number;
   size?: "lg" | "md";
 }) {
-  const { slug, name, region, tagline, image, altitudeM } = destination;
+  const { slug, name, region, tagline, image, cardImage, altitudeM } = destination;
   const label = (
     <>
       {typeof index === "number" && <span className="text-accent">{pad2(index + 1)}</span>}
@@ -75,7 +75,7 @@ export function DestinationCard({
         className="theme-dark group relative isolate flex h-full min-h-[26rem] flex-col justify-end overflow-hidden rounded-2xl bg-night shadow-soft transition-[box-shadow,transform] duration-500 ease-out-expo hover:-translate-y-0.5 hover:shadow-lift motion-reduce:hover:translate-y-0"
       >
         <Image
-          src={image}
+          src={cardImage ?? image}
           alt=""
           fill
           sizes={SIZES_LG}

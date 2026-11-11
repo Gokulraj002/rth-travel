@@ -11,7 +11,7 @@ import type { CSSProperties } from "react";
  *   transform/opacity only, hidden under reduced motion.
  */
 const RX = 3.3; // em — half the ring's width (the word itself is ≈ 5.1em wide)
-const RY = 0.62; // em — half the ring's height (clears the caps above and below)
+const RY = 0.55; // em — half the ring's height (clears the caps above and below)
 const PAD = 0.1; // em — room for the stroke
 
 const W = Math.round((RX + PAD) * 200) / 100;
@@ -38,7 +38,7 @@ export function HeroOrbit({ delay = 0 }: { delay?: number }) {
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Zero-size anchor at the word's optical centre, tilted like the logo swoosh */}
-      <span className="absolute left-1/2 top-[52%] size-0 -rotate-6" style={orbitVars}>
+      <span className="absolute left-1/2 top-[52%] size-0 -rotate-[4deg]" style={orbitVars}>
         <svg
           viewBox={`0 0 ${u(W)} ${u(H)}`}
           fill="none"

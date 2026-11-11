@@ -26,6 +26,7 @@ export const destinations: Destination[] = [
       "Taste a traditional Wazwan feast",
     ],
     image: "/images/destinations/srinagar.jpg",
+    cardImage: "/images/destinations/srinagar-5.jpg",
     gallery: [
       "/images/destinations/srinagar-2.jpg",
       "/images/destinations/srinagar-3.jpg",

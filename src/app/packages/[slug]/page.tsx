@@ -216,6 +216,8 @@ export default async function PackagePage({ params }: PageProps<"/packages/[slug
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted text-pretty sm:text-[17px]">
                 {pkg.subtitle}
+                {/* Subtitles double as taglines (no full stop) — close the sentence before the route. */}
+                {/[.!?)]$/.test(pkg.subtitle.trim()) ? "" : "."}
                 {chain.length > 1 && <> The route runs {chain.join(" → ")}.</>}
               </p>
 

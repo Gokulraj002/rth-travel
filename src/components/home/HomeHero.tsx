@@ -49,7 +49,7 @@ export function HomeHero() {
           <HeroTitle id="home-hero-title" />
 
           <HeroFadeUp delay={180} y={10}>
-            <p className="mt-5 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-base text-muted sm:mt-6 sm:text-lg">
+            <p className="mt-5 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-base text-muted sm:mt-8 sm:text-lg md:mt-10 lg:mt-12">
               <span className="sr-only">{site.tagline}</span>
               {site.taglineParts.map((part, i) => (
                 <span key={part} aria-hidden="true" className="inline-flex items-center gap-2.5">

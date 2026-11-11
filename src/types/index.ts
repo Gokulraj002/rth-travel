@@ -38,6 +38,8 @@ export interface Destination {
   thingsToDo: string[];
   /** Path under /public, e.g. "/images/destinations/srinagar.jpg" */
   image: string;
+  /** Optional brighter/cleaner photo for the large featured card (falls back to `image`). */
+  cardImage?: string;
   gallery: string[];
   /** Photographer credit for the hero image (Unsplash) */
   credit: string;

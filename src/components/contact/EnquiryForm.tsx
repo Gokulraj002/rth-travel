@@ -13,11 +13,15 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ChevronDown, CircleCheck, Mail, MessageCircle, Minus, Phone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { destinations, regionLabels } from "@/data/destinations";
-import { packages } from "@/data/packages";
-import { site } from "@/data/site";
+import { useSite } from "@/components/layout/SiteProvider";
+import { regionLabels } from "@/data/labels";
+import { enquirySavingEnabled, saveEnquiry } from "@/lib/enquiry";
 import { cn, whatsappLink } from "@/lib/utils";
-import type { Region, TourPackage } from "@/types";
+import type { Destination, Region, TourPackage } from "@/types";
+
+/** The destination / package fields this form needs (passed from the server page, from the CMS). */
+export type EnquiryDestination = Pick<Destination, "slug" | "name" | "region">;
+export type EnquiryPackage = Pick<TourPackage, "slug" | "title" | "region" | "nights" | "days" | "destinations">;
 
 /* ------------------------------------------------------------------ */
 /* Options                                                             */
@@ -57,13 +61,13 @@ function subscribeToLocation(onChange: () => void) {
 const getSearch = () => window.location.search;
 const getServerSearch = () => "";
 
-function findPackage(value?: string | null): TourPackage | undefined {
+function findPackage(packages: EnquiryPackage[], value?: string | null): EnquiryPackage | undefined {
   if (!value) return undefined;
   const v = value.trim().toLowerCase();
   return packages.find((p) => p.slug === v || p.title.toLowerCase() === v);
 }
 
-function findDestinationSlug(value?: string | null): string | undefined {
+function findDestinationSlug(destinations: EnquiryDestination[], value?: string | null): string | undefined {
   if (!value) return undefined;
   const v = value.trim().toLowerCase();
   return destinations.find((d) => d.slug === v || d.name.toLowerCase() === v)?.slug;
@@ -123,19 +127,19 @@ function plural(n: number, one: string, many: string) {
 
 function composeMessage(
   v: Values,
-  destinationSlug: string,
-  pkg: TourPackage | undefined,
+  siteName: string,
+  destination: string | undefined,
+  pkg: EnquiryPackage | undefined,
   channel: "whatsapp" | "email",
 ) {
   const bold = (s: string) => (channel === "whatsapp" ? `*${s}*` : s);
-  const destination = destinations.find((d) => d.slug === destinationSlug)?.name;
   const adults = Number(v.adults);
   const children = Number(v.children || 0);
   const travellers =
     plural(adults, "adult", "adults") + (children > 0 ? `, ${plural(children, "child", "children")}` : "");
 
   const lines: (string | null)[] = [
-    `Hello ${site.name}! I'd like to plan a trip.`,
+    `Hello ${siteName}! I'd like to plan a trip.`,
     "",
     bold("Trip enquiry"),
     `Name: ${v.name.trim()}`,
@@ -304,16 +308,26 @@ function Stepper({
 type Sent = { channel: "whatsapp" | "email"; href: string } | null;
 
 /**
- * Trip enquiry form. Front-end only: on submit it composes a WhatsApp message (primary)
- * or a mailto: (secondary). Prefills from props, else from `?package=` / `?destination=`.
+ * Trip enquiry form. On submit it composes a WhatsApp message (primary) or a mailto: (secondary).
+ * Prefills from props, else from `?package=` / `?destination=`. `destinations` / `packages` come from
+ * the server page (CMS); contact details from `useSite()`.
+ *
+ * Lead saving: right before WhatsApp / the email app opens, the enquiry is also posted to the CMS inbox
+ * (`saveEnquiry`, fire-and-forget, source "website") when NEXT_PUBLIC_CMS_API_URL is set. It never delays
+ * or blocks the hand-off. A hidden honeypot field (`website`) is sent along for the API's spam check.
  */
 export function EnquiryForm({
+  destinations,
+  packages,
   defaultPackage,
   defaultDestination,
 }: {
+  destinations: EnquiryDestination[];
+  packages: EnquiryPackage[];
   defaultPackage?: string;
   defaultDestination?: string;
 }) {
+  const site = useSite();
   const uid = useId();
   const fid = (key: string) => `${uid}-${key}`;
   const reduce = useReducedMotion();
@@ -322,14 +336,14 @@ export function EnquiryForm({
   const search = useSyncExternalStore(subscribeToLocation, getSearch, getServerSearch);
   const initial = useMemo(() => {
     const q = new URLSearchParams(search);
-    const pkg = findPackage(defaultPackage) ?? findPackage(q.get("package"));
+    const pkg = findPackage(packages, defaultPackage) ?? findPackage(packages, q.get("package"));
     const destination =
-      findDestinationSlug(defaultDestination) ??
-      findDestinationSlug(q.get("destination")) ??
+      findDestinationSlug(destinations, defaultDestination) ??
+      findDestinationSlug(destinations, q.get("destination")) ??
       pkg?.destinations[0] ??
       "";
     return { pkg: pkg?.slug ?? "", destination };
-  }, [search, defaultPackage, defaultDestination]);
+  }, [search, defaultPackage, defaultDestination, packages, destinations]);
 
   // `null` = untouched → falls back to the prefill, so no effect/state sync is needed.
   const [destinationEdit, setDestinationEdit] = useState<string | null>(null);
@@ -348,6 +362,8 @@ export function EnquiryForm({
     hotel: "",
     message: "",
   });
+  // Honeypot: hidden from people (off-screen, not focusable); bots that fill every field get filtered by the API.
+  const [honeypot, setHoneypot] = useState("");
   const set = <K extends keyof Values>(key: K, value: Values[K]) => setValues((v) => ({ ...v, [key]: value }));
 
   const [attempted, setAttempted] = useState(false);
@@ -365,14 +381,14 @@ export function EnquiryForm({
       REGION_ORDER.map((region) => ({ region, items: packages.filter((p) => p.region === region) })).filter(
         (g) => g.items.length > 0,
       ),
-    [],
+    [packages],
   );
   const destinationGroups = useMemo(
     () =>
       REGION_ORDER.map((region) => ({ region, items: destinations.filter((d) => d.region === region) })).filter(
         (g) => g.items.length > 0,
       ),
-    [],
+    [destinations],
   );
 
   /** Validate; on failure announce and focus the first invalid field. */
@@ -397,20 +413,44 @@ export function EnquiryForm({
     if (pkg && !destination) setDestinationEdit(pkg.destinations[0] ?? "");
   }
 
+  const destinationName = destinations.find((d) => d.slug === destination)?.name;
+
+  /** Fire-and-forget copy to the CMS inbox — called just before WhatsApp / the email app opens. */
+  function save() {
+    saveEnquiry({
+      name: values.name.trim(),
+      phone: values.phone.trim(),
+      email: values.email.trim() || undefined,
+      destination: destinationName,
+      package: selectedPackage?.title,
+      travelMonth: values.month || undefined,
+      adults: Number(values.adults),
+      children: Number(values.children || 0),
+      hotelCategory: values.hotel || undefined,
+      message: values.message.trim() || undefined,
+      source: "website",
+      website: honeypot,
+    });
+  }
+
   function sendWhatsApp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!check()) return;
-    const href = whatsappLink(composeMessage(values, destination, selectedPackage, "whatsapp"));
+    const href = whatsappLink(
+      site.whatsapp,
+      composeMessage(values, site.name, destinationName, selectedPackage, "whatsapp"),
+    );
+    save();
     window.open(href, "_blank", "noopener,noreferrer");
     setSent({ channel: "whatsapp", href });
   }
 
   function sendEmail() {
     if (!check()) return;
-    const destName = destinations.find((d) => d.slug === destination)?.name;
-    const subject = `Trip enquiry${destName ? ` — ${destName}` : ""} — ${values.name.trim()}`;
-    const body = composeMessage(values, destination, selectedPackage, "email");
+    const subject = `Trip enquiry${destinationName ? ` — ${destinationName}` : ""} — ${values.name.trim()}`;
+    const body = composeMessage(values, site.name, destinationName, selectedPackage, "email");
     const href = `mailto:${site.emails[0]}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    save();
     window.location.assign(href);
     setSent({ channel: "email", href });
   }
@@ -498,6 +538,20 @@ export function EnquiryForm({
             aria-label="Trip enquiry"
             className="grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-2"
           >
+            {/* Honeypot (spam trap): off-screen and out of the tab order, so people never see or fill it. */}
+            <div aria-hidden="true" className="absolute -left-[9999px] top-0 size-px overflow-hidden">
+              <label htmlFor={fid("website")}>Website</label>
+              <input
+                id={fid("website")}
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </div>
+
             <Field id={fid("name")} label="Full name" required error={errors.name}>
               <input
                 id={fid("name")}
@@ -712,7 +766,9 @@ export function EnquiryForm({
               </Button>
             </div>
             <p className="-mt-2 text-xs leading-relaxed text-faint sm:col-span-2">
-              Nothing is stored on this website — your details go straight to our WhatsApp or inbox.
+              {enquirySavingEnabled
+                ? "We keep a copy of your enquiry so our team can follow up — it also opens in WhatsApp or your inbox."
+                : "Nothing is stored on this website — your details go straight to our WhatsApp or inbox."}
               <span className="text-accent" aria-hidden="true">
                 {" "}
                 *

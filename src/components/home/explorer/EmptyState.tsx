@@ -1,10 +1,12 @@
 import { MessageCircle, Sparkles } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
-import { site } from "@/data/site";
+import { site as localSite } from "@/data/site";
+import { useSite } from "@/components/layout/SiteProvider";
 import { whatsappLink } from "@/lib/utils";
 
 /** Shown when there are no packages in the data yet. */
 export function EmptyState({ originCity }: { originCity?: string }) {
+  const site = useSite();
   const from = originCity ? ` I'll be flying in from ${originCity}.` : "";
   return (
     <div className="relative overflow-hidden rounded-2xl border border-line bg-surface p-6 shadow-lift sm:p-10">
@@ -22,10 +24,11 @@ export function EmptyState({ originCity }: { originCity?: string }) {
         </h3>
         <p className="mt-4 text-[15px] leading-relaxed text-muted text-pretty sm:text-base">
           Tell us your dates, who&apos;s travelling and what you dream of — houseboats, snow, high passes or a
-          pilgrimage — and we&apos;ll plan a trip across {site.destinationsLine.join(", ")} around you.
+          pilgrimage — and we&apos;ll plan a trip across {localSite.destinationsLine.join(", ")} around you.
         </p>
         <ButtonLink
           href={whatsappLink(
+            site.whatsapp,
             `Hi ${site.name}! I'd like a custom itinerary for Kashmir / Ladakh.${from} Can you help me plan it?`,
           )}
           variant="primary"

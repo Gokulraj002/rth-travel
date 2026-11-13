@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { DetailPageSkeleton } from "@/components/shared/DetailPageSkeleton";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { destinations, getDestination, regionLabels } from "@/data/destinations";
-import { getPackagesForDestination } from "@/data/packages";
-import { site } from "@/data/site";
+import { regionLabels } from "@/data/labels";
+import { getDestination, getDestinations, getPackagesForDestination, getSite } from "@/lib/cms";
 import { PageHero } from "@/components/shared/PageHero";
 import { CtaBand } from "@/components/shared/CtaBand";
 import { PackageCard } from "@/components/packages/PackageCard";
@@ -13,15 +14,20 @@ import { DestinationGallery } from "@/components/destinations/DestinationGallery
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, Section, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
-import { cn, pad2 } from "@/lib/utils";
+import { absoluteUrl, cn, nameMap, pad2 } from "@/lib/utils";
 
-export function generateStaticParams() {
+const PLACEHOLDER = "__placeholder__";
+
+export async function generateStaticParams() {
+  const destinations = await getDestinations();
+  // cacheComponents requires at least one entry (the placeholder renders the 404 page).
+  if (destinations.length === 0) return [{ slug: PLACEHOLDER }];
   return destinations.map((d) => ({ slug: d.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/destinations/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const destination = getDestination(slug);
+  const [destination, site] = await Promise.all([getDestination(slug), getSite()]);
   if (!destination) return { title: "Destination not found" };
 
   const { name, tagline, description, image } = destination;
@@ -41,15 +47,30 @@ export async function generateMetadata({ params }: PageProps<"/destinations/[slu
   };
 }
 
-export default async function DestinationPage({ params }: PageProps<"/destinations/[slug]">) {
+export default function DestinationPage({ params }: PageProps<"/destinations/[slug]">) {
+  // Param-dependent content sits inside <Suspense>: Cache Components may regenerate this route's
+  // static shell at runtime (after a CMS edit), when no slug is known. Known slugs stay fully prerendered.
+  return (
+    <Suspense fallback={<DetailPageSkeleton />}>
+      <DestinationContent params={params} />
+    </Suspense>
+  );
+}
+
+async function DestinationContent({ params }: { params: PageProps<"/destinations/[slug]">["params"] }) {
   const { slug } = await params;
-  const destination = getDestination(slug);
+  const [destinations, trips, site] = await Promise.all([
+    getDestinations(),
+    getPackagesForDestination(slug),
+    getSite(),
+  ]);
+  const destination = destinations.find((d) => d.slug === slug);
   if (!destination) notFound();
 
   const { name, displayName, region, tagline, description, image, gallery, highlights, thingsToDo, geo } =
     destination;
   const regionLabel = regionLabels[region];
-  const trips = getPackagesForDestination(slug);
+  const names = nameMap(destinations);
 
   const i = destinations.findIndex((d) => d.slug === slug);
   const prev = destinations[(i - 1 + destinations.length) % destinations.length];
@@ -62,7 +83,7 @@ export default async function DestinationPage({ params }: PageProps<"/destinatio
     name,
     description,
     url,
-    image: [image, ...gallery].map((src) => `${site.url}${src}`),
+    image: [image, ...gallery].map((src) => absoluteUrl(src, site.url)),
     geo: { "@type": "GeoCoordinates", latitude: geo.lat, longitude: geo.lng, elevation: destination.altitudeM },
     containedInPlace: { "@type": "Place", name: `${regionLabel}, India` },
     includesAttraction: highlights.map((h) => ({ "@type": "TouristAttraction", name: h })),
@@ -202,7 +223,7 @@ export default async function DestinationPage({ params }: PageProps<"/destinatio
             <ul role="list" className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 [&>li]:min-w-0">
               {trips.map((pkg) => (
                 <li key={pkg.slug}>
-                  <PackageCard pkg={pkg} />
+                  <PackageCard pkg={pkg} names={names} />
                 </li>
               ))}
             </ul>

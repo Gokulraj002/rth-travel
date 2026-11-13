@@ -4,9 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
+    "build:turbo": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "backend:seed": "node --experimental-strip-types --no-warnings scripts/export-seed.mts",
+    "backend:zip": "sh scripts/package-backend.sh",
+    "backend:dev": "php -S 127.0.0.1:8095 -t backend/public backend/bin/dev-router.php"
   },
   "browserslist": [
     "chrome >= 111",
@@ -31,7 +35,7 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
-    "@tailwindcss/turbopack": "4.3.3",
+    "@tailwindcss/postcss": "4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

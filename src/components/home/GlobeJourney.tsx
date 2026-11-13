@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
+import type { JourneyStop } from "@/types";
 import GlobeStage from "@/components/three/GlobeStage";
-import { destinations } from "@/data/destinations";
 import { useJourney } from "@/lib/store";
 import { stepId } from "./journey/shared";
 import { OriginSelect } from "./journey/OriginSelect";
@@ -10,14 +10,11 @@ import { JourneyIntro } from "./journey/JourneyIntro";
 import { DesktopRail, MobileChips } from "./journey/JourneyRail";
 import { DesktopPanel, MobileSheet } from "./journey/JourneyPanel";
 
-/** Intro step (−1) followed by one step per destination. */
-const STEP_INDICES = [-1, ...destinations.map((_, i) => i)];
-
 /**
  * Overlay UI — the only part that subscribes to `activeIndex`, so the WebGL
  * stage never re-renders when the journey advances.
  */
-function JourneyOverlay() {
+function JourneyOverlay({ stops }: { stops: JourneyStop[] }) {
   const activeIndex = useJourney((s) => s.activeIndex);
 
   return (
@@ -43,13 +40,13 @@ function JourneyOverlay() {
         <OriginSelect />
       </div>
 
-      <DesktopRail activeIndex={activeIndex} />
-      <MobileChips activeIndex={activeIndex} />
+      <DesktopRail stops={stops} activeIndex={activeIndex} />
+      <MobileChips stops={stops} activeIndex={activeIndex} />
 
       {activeIndex < 0 && <JourneyIntro key="intro" />}
 
-      <DesktopPanel activeIndex={activeIndex} />
-      <MobileSheet activeIndex={activeIndex} />
+      <DesktopPanel stops={stops} activeIndex={activeIndex} />
+      <MobileSheet stops={stops} activeIndex={activeIndex} />
     </div>
   );
 }
@@ -60,8 +57,11 @@ function JourneyOverlay() {
  * full-height steps below it drive `useJourney.activeIndex` (−1 intro → 0…n−1 destinations).
  * Sticky CSS handles the pinning; the step divs are only scroll targets for the rail / chips
  * (`scrollToStep`, which lands each step just under the header via `scroll-padding-top`).
+ * `stops` (one per destination, in journey order) comes from the server parent (CMS).
  */
-export function GlobeJourney() {
+export function GlobeJourney({ stops }: { stops: JourneyStop[] }) {
+  /** Intro step (−1) followed by one step per destination. */
+  const stepCount = stops.length + 1;
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ export function GlobeJourney() {
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
-    const steps = STEP_INDICES.length;
+    const steps = stepCount;
     let lastIndex: number | null = null;
     let lastBar = -1;
     let frame = 0;
@@ -104,7 +104,8 @@ export function GlobeJourney() {
         bar = 0;
       } else {
         // Past the end the clamp keeps the last stop (no reset).
-        index = STEP_INDICES[Math.min(steps - 1, Math.max(0, Math.floor(progress * steps)))];
+        // Step k (0 = intro) → activeIndex k − 1.
+        index = Math.min(steps - 1, Math.max(0, Math.floor(progress * steps))) - 1;
         // Bar fills while the sticky stage is pinned (section top at the header → section bottom
         // at the stage bottom).
         bar = Math.min(1, Math.max(0, (headerH - rect.top) / Math.max(1, total - (stageH || vh - headerH))));
@@ -165,7 +166,7 @@ export function GlobeJourney() {
       listen(false);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [stepCount]);
 
   // Reset the globe to the intro view when the section unmounts (route change).
   useEffect(() => () => useJourney.getState().setActiveIndex(-1), []);
@@ -176,14 +177,14 @@ export function GlobeJourney() {
       id="journey"
       aria-label="Journey across Kashmir, Ladakh and Jammu"
       className="theme-dark relative h-[calc(var(--journey-steps)*100svh)] bg-night"
-      style={{ "--journey-steps": STEP_INDICES.length } as CSSProperties}
+      style={{ "--journey-steps": stepCount } as CSSProperties}
     >
       <h2 className="sr-only">Journey across Kashmir, Ladakh and Jammu</h2>
 
       {/* Pinned below the sticky header (in flow, height var(--header-h)). */}
       <div ref={stageRef} className="sticky top-[var(--header-h)] h-[calc(100svh-var(--header-h))] overflow-hidden">
-        <GlobeStage className="absolute inset-0" />
-        <JourneyOverlay />
+        <GlobeStage className="absolute inset-0" stops={stops} />
+        <JourneyOverlay stops={stops} />
 
         {/* Journey progress */}
         <div aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 bg-line">
@@ -193,8 +194,8 @@ export function GlobeJourney() {
 
       {/* Invisible scroll steps: intro + one per destination */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0">
-        {STEP_INDICES.map((i) => (
-          <div key={i} id={stepId(i)} data-journey-step={i} className="h-[100svh]" />
+        {Array.from({ length: stepCount }, (_, k) => k - 1).map((i) => (
+          <div key={i} id={stepId(i, stops[i]?.slug)} data-journey-step={i} className="h-[100svh]" />
         ))}
       </div>
     </section>

@@ -1,6 +1,6 @@
 import { Car, Headphones, MapPin, MessageCircle, Phone, SlidersHorizontal } from "lucide-react";
 import type { TourPackage } from "@/types";
-import { site } from "@/data/site";
+import { getSite } from "@/lib/cms";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn, formatINR, whatsappLink } from "@/lib/utils";
 import { MobileEnquiryBar } from "./MobileEnquiryBar";
@@ -19,9 +19,10 @@ const CARD_ID = "enquire";
  * "Enquire on WhatsApp" bar (MobileEnquiryBar) that hides once this card is reached.
  * A solid white card (no backdrop blur); sticks just below the sticky site header on lg+.
  */
-export function BookingSidebar({ pkg, className }: { pkg: TourPackage; className?: string }) {
+export async function BookingSidebar({ pkg, className }: { pkg: TourPackage; className?: string }) {
+  const site = await getSite();
   const message = `Hi ${site.name}! I'm interested in the "${pkg.title}" package (${pkg.nights}N / ${pkg.days}D). Could you share availability and a quote?`;
-  const href = whatsappLink(message);
+  const href = whatsappLink(site.whatsapp, message);
   const price = formatINR(pkg.priceFrom);
 
   return (

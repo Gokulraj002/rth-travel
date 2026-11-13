@@ -1,5 +1,5 @@
 import { MessageCircle } from "lucide-react";
-import { faqs } from "@/data/content";
+import { getFaqs, getSite } from "@/lib/cms";
 import { FaqList } from "@/components/shared/FaqList";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, Section, SectionHeading } from "@/components/ui/primitives";
@@ -7,7 +7,8 @@ import { Reveal } from "@/components/ui/Reveal";
 import { whatsappLink } from "@/lib/utils";
 
 /** Home FAQ: sticky heading + WhatsApp prompt on the left, accordion on the right. */
-export function HomeFaq() {
+export async function HomeFaq() {
+  const [faqs, site] = await Promise.all([getFaqs(), getSite()]);
   if (faqs.length === 0) return null;
 
   return (
@@ -27,7 +28,7 @@ export function HomeFaq() {
                   Message us on WhatsApp — a real person from our Srinagar team will reply with straight answers.
                 </p>
                 <ButtonLink
-                  href={whatsappLink("Hi Reyaan Trip Holiday! I have a question about a trip.")}
+                  href={whatsappLink(site.whatsapp, "Hi Reyaan Trip Holiday! I have a question about a trip.")}
                   variant="primary"
                   className="mt-5 w-full sm:w-auto"
                 >

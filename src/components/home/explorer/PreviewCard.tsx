@@ -6,7 +6,15 @@ import { ArrowRight, Check, MessageCircle } from "lucide-react";
 import type { TourPackage } from "@/types";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn, formatINR, whatsappLink } from "@/lib/utils";
-import { destinationChain, durationLabel, enquiryMessage, packageCode, packageImage } from "./utils";
+import { useSite } from "@/components/layout/SiteProvider";
+import {
+  destinationChain,
+  durationLabel,
+  enquiryMessage,
+  packageCode,
+  packageImage,
+  type DestinationLookup,
+} from "./utils";
 
 /** Up to four highlights with leaf-green ticks (the RTH logo leaves). */
 export function HighlightList({ pkg }: { pkg: TourPackage }) {
@@ -37,6 +45,7 @@ export function PackageCtas({
   originCity?: string;
   size?: "sm" | "md";
 }) {
+  const { whatsapp } = useSite();
   return (
     <div className="flex flex-wrap gap-3">
       {/* Filled surface-2 + strong hairline so it stays visible on a white card (light) and a navy card (dark). */}
@@ -50,7 +59,7 @@ export function PackageCtas({
         <ArrowRight aria-hidden className="size-3.5" />
       </ButtonLink>
       <ButtonLink
-        href={whatsappLink(enquiryMessage(pkg, originCity))}
+        href={whatsappLink(whatsapp, enquiryMessage(pkg, originCity))}
         variant="primary"
         size={size}
         className="flex-1 sm:flex-none"
@@ -73,8 +82,16 @@ const FADE_MS = 350;
 
 type Layer = { pkg: TourPackage; fade: boolean };
 
-export function PreviewCard({ pkg, originCity }: { pkg: TourPackage; originCity?: string }) {
-  const chain = destinationChain(pkg);
+export function PreviewCard({
+  pkg,
+  lookup,
+  originCity,
+}: {
+  pkg: TourPackage;
+  lookup: DestinationLookup;
+  originCity?: string;
+}) {
+  const chain = destinationChain(pkg, lookup);
 
   // Photo layers, bottom → top. A new selection is pushed on top (state adjusted during render).
   const [layers, setLayers] = useState<Layer[]>(() => [{ pkg, fade: false }]);
@@ -103,8 +120,8 @@ export function PreviewCard({ pkg, originCity }: { pkg: TourPackage; originCity?
               )}
             >
               <Image
-                src={packageImage(p)}
-                alt={top ? `${p.title} — ${destinationChain(p)}` : ""}
+                src={packageImage(p, lookup)}
+                alt={top ? `${p.title} — ${destinationChain(p, lookup)}` : ""}
                 fill
                 loading="lazy"
                 sizes="(min-width: 1280px) 432px, (min-width: 1024px) 400px, 1px"
@@ -116,7 +133,7 @@ export function PreviewCard({ pkg, originCity }: { pkg: TourPackage; originCity?
         {/* Solid surface chips over the photo (no backdrop blur) — white on light pages, navy on the dark home */}
         <div className="absolute inset-x-0 top-0 flex items-center justify-between p-3.5">
           <span className="rounded-md border border-line bg-surface/95 px-2 py-1 text-[11px] font-semibold tracking-[0.1em] text-accent shadow-soft">
-            {packageCode(pkg)}
+            {packageCode(pkg, lookup)}
           </span>
           <span className="rounded-full border border-line bg-surface/95 px-3 py-1 text-[12px] font-semibold tabular-nums text-ink shadow-soft">
             {durationLabel(pkg)}

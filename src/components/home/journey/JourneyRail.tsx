@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { destinations, regionLabels } from "@/data/destinations";
+import type { JourneyStop } from "@/types";
+import { regionLabels } from "@/data/labels";
 import { cn, pad2 } from "@/lib/utils";
 import { scrollToStep } from "./shared";
 
-const total = destinations.length;
-
 /** Desktop (≥lg): numbered vertical list down the left edge with a progress track. */
-export function DesktopRail({ activeIndex }: { activeIndex: number }) {
+export function DesktopRail({ stops, activeIndex }: { stops: JourneyStop[]; activeIndex: number }) {
+  const total = stops.length;
   const progress = activeIndex < 0 ? 0 : (activeIndex + 1) / total;
 
   return (
@@ -29,7 +29,7 @@ export function DesktopRail({ activeIndex }: { activeIndex: number }) {
           </div>
 
           <ol className="flex flex-col">
-            {destinations.map((d, i) => {
+            {stops.map((d, i) => {
               const active = i === activeIndex;
               const visited = activeIndex >= 0 && i < activeIndex;
               return (
@@ -96,7 +96,8 @@ export function DesktopRail({ activeIndex }: { activeIndex: number }) {
  * Each button is a 44px-tall tap target around a 32px visual chip. Below md the chips
  * use a solid translucent fill instead of backdrop blur (cheaper over the live canvas).
  */
-export function MobileChips({ activeIndex }: { activeIndex: number }) {
+export function MobileChips({ stops, activeIndex }: { stops: JourneyStop[]; activeIndex: number }) {
+  const total = stops.length;
   const rowRef = useRef<HTMLOListElement>(null);
 
   // Centre the active chip within the row only. Equivalent to
@@ -132,7 +133,7 @@ export function MobileChips({ activeIndex }: { activeIndex: number }) {
         ref={rowRef}
         className="flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain scroll-px-4 px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {destinations.map((d, i) => {
+        {stops.map((d, i) => {
           const active = i === activeIndex;
           return (
             <li key={d.slug} className="shrink-0 snap-center">

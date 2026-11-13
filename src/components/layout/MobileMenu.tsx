@@ -4,10 +4,11 @@ import { useEffect, useRef, type RefObject } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRight, Mail, MapPin, Phone, X } from "lucide-react";
-import { navLinks, site } from "@/data/site";
+import { navLinks } from "@/data/site";
 import { cn, pad2, whatsappLink } from "@/lib/utils";
 import { WhatsAppIcon } from "@/components/layout/WhatsAppFab";
 import { Brand, PLAN_MSG, isActive } from "./NavBrand";
+import { useSite } from "./SiteProvider";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -44,6 +45,7 @@ export function MobileMenu({
   pathname: string;
   dialogRef: RefObject<HTMLDivElement | null>;
 }) {
+  const site = useSite();
   const reduce = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -188,7 +190,7 @@ export function MobileMenu({
 
             <motion.div className="mt-auto pt-6" {...rise(0.32)}>
               <a
-                href={whatsappLink(PLAN_MSG)}
+                href={whatsappLink(site.whatsapp, PLAN_MSG)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-12 w-full items-center justify-center gap-2.5 rounded-full bg-primary px-6 text-[15px] font-semibold text-white shadow-[0_6px_20px_-8px_rgb(0_84_144/0.55)] transition-[background-color,transform] duration-300 ease-out-expo hover:bg-primary-bright active:scale-[0.98]"

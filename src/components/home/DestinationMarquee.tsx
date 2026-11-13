@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, useEffect, useRef } from "react";
-import { destinations } from "@/data/destinations";
 import { cn } from "@/lib/utils";
 
 /** Logo light-blue (#84a8cc) outline word — reads clearly on the dark navy home band. */
@@ -39,9 +38,9 @@ function Track({
  * Perf: the `marquee` keyframes animate `transform` only. Rows are paused by default and only run
  * (with `will-change: transform`) while an IntersectionObserver sees the band near the viewport,
  * so offscreen it costs no compositor frames or layer memory. Pauses on hover; never runs under
- * prefers-reduced-motion.
+ * prefers-reduced-motion. `items` (name + tagline per destination) comes from the server parent (CMS).
  */
-export function DestinationMarquee() {
+export function DestinationMarquee({ items }: { items: { slug: string; name: string; tagline: string }[] }) {
   const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,7 +58,7 @@ export function DestinationMarquee() {
     };
   }, []);
 
-  const names = destinations.map((d) => d.name);
+  const names = items.map((d) => d.name);
   if (names.length === 0) return null;
   // Keep each track an even length so solid/outline alternation is seamless across the loop.
   const words = names.length % 2 === 0 ? names : [...names, ...names];
@@ -72,7 +71,7 @@ export function DestinationMarquee() {
   return (
     <section aria-label="Destinations we cover" className="relative overflow-hidden border-y border-line bg-night-2 py-8 sm:py-10">
       <ul className="sr-only">
-        {destinations.map((d) => (
+        {items.map((d) => (
           <li key={d.slug}>
             {d.name} — {d.tagline}
           </li>

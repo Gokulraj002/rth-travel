@@ -1,4 +1,6 @@
-import type { TourPackage, TripCategory } from "@/types";
+import type { TourPackage } from "@/types";
+
+// Category display names live in ./labels.ts (shared with client components).
 
 /**
  * Tour packages.
@@ -688,15 +690,6 @@ export const packages: TourPackage[] = [
     ],
   },
 ];
-
-export const categoryLabels: Record<TripCategory, string> = {
-  honeymoon: "Honeymoon",
-  family: "Family",
-  adventure: "Adventure",
-  pilgrimage: "Pilgrimage",
-  snow: "Snow & Winter",
-  group: "Group Tours",
-};
 
 export function getPackage(slug: string) {
   return packages.find((p) => p.slug === slug);

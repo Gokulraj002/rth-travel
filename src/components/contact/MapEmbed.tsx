@@ -1,12 +1,12 @@
 import { ArrowUpRight, MapPin } from "lucide-react";
-import { site } from "@/data/site";
+import { getSite } from "@/lib/cms";
 import { cn } from "@/lib/utils";
 
-const embedSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&output=embed`;
-const openHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`;
-
 /** Lazy Google Maps embed (normal colours) in a rounded, hairline-bordered frame. */
-export function MapEmbed({ className }: { className?: string }) {
+export async function MapEmbed({ className }: { className?: string }) {
+  const site = await getSite();
+  const embedSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.mapQuery)}&output=embed`;
+  const openHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapQuery)}`;
   return (
     <figure className={cn("relative overflow-hidden rounded-2xl border border-line bg-surface shadow-soft", className)}>
       <div className="relative bg-surface-2">

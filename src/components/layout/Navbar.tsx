@@ -5,10 +5,11 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, Phone } from "lucide-react";
-import { navLinks, site } from "@/data/site";
+import { navLinks } from "@/data/site";
 import { cn, whatsappLink } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/Button";
 import { Brand, PLAN_MSG, isActive } from "./NavBrand";
+import { useSite } from "./SiteProvider";
 
 /**
  * The full-screen mobile menu (and the `motion` library it animates with) is a separate chunk,
@@ -19,14 +20,25 @@ const prefetchMenu = () => {
   void import("./MobileMenu");
 };
 
-const phone = site.phones[0];
-
 /**
  * Light, always-visible sticky header. It sits in the normal document flow (`sticky`, not `fixed`),
  * so pages need no top padding to clear it; its height is `--header-h` (64px / 76px on lg+, globals.css).
  */
 export function Navbar() {
-  const pathname = usePathname();
+  // usePathname() is request-time data under Cache Components: it lives here, inside the <Suspense>
+  // boundary set in the root layout, so pages whose static shell must be regenerated at runtime
+  // (e.g. /packages/[slug] after a CMS edit) can still prerender — they show <NavbarFallback/> meanwhile.
+  return <NavbarView pathname={usePathname()} />;
+}
+
+/** Same header without route awareness (no active link, light theme) — the Suspense fallback. */
+export function NavbarFallback() {
+  return <NavbarView pathname="" />;
+}
+
+function NavbarView({ pathname }: { pathname: string }) {
+  const site = useSite();
+  const phone = site.phones[0];
   const isHome = pathname === "/";
 
   const [open, setOpen] = useState(false);
@@ -195,7 +207,7 @@ export function Navbar() {
                 {phone.display}
               </span>
             </a>
-            <ButtonLink href={whatsappLink(PLAN_MSG)} size="md" className="hidden sm:inline-flex">
+            <ButtonLink href={whatsappLink(site.whatsapp, PLAN_MSG)} size="md" className="hidden sm:inline-flex">
               Plan a trip
               <span className="sr-only">(opens WhatsApp in a new tab)</span>
             </ButtonLink>

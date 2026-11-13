@@ -1,4 +1,6 @@
-import type { Destination, Region } from "@/types";
+import type { Destination } from "@/types";
+
+// Region display names live in ./labels.ts (shared with client components).
 
 /**
  * Destinations, ordered as the globe journey visits them on the home page.
@@ -200,12 +202,6 @@ export const destinations: Destination[] = [
     credit: "Unsplash",
   },
 ];
-
-export const regionLabels: Record<Region, string> = {
-  kashmir: "Kashmir Valley",
-  ladakh: "Ladakh",
-  jammu: "Jammu Region",
-};
 
 export function getDestination(slug: string) {
   return destinations.find((d) => d.slug === slug);

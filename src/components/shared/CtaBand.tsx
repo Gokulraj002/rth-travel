@@ -4,7 +4,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Container, Eyebrow, Section } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
 import { WhatsAppIcon } from "@/components/layout/WhatsAppFab";
-import { site } from "@/data/site";
+import { getSite } from "@/lib/cms";
 import { whatsappLink } from "@/lib/utils";
 
 /**
@@ -12,13 +12,14 @@ import { whatsappLink } from "@/lib/utils";
  * logo-blue glow with a leaf hint, WhatsApp + call CTAs. The outer wrapper sits in light scope so
  * `shadow-lift` keeps its soft navy tint on light pages.
  */
-export function CtaBand({
+export async function CtaBand({
   title = "Your Kashmir story starts with one message.",
   subtitle = "Tell us your dates and who's travelling — we'll craft the route, stays and rides.",
 }: {
   title?: string;
   subtitle?: string;
 }) {
+  const site = await getSite();
   const phone = site.phones[0];
   const email = site.emails[0];
 
@@ -58,7 +59,7 @@ export function CtaBand({
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <ButtonLink
-                    href={whatsappLink("Hi Reyaan Trip Holiday! I'd like help planning a trip.")}
+                    href={whatsappLink(site.whatsapp, "Hi Reyaan Trip Holiday! I'd like help planning a trip.")}
                     variant="primary"
                     size="lg"
                     className="w-full sm:w-auto"

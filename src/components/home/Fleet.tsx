@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { ArrowUpRight, Check, MessageCircle, Phone, Users } from "lucide-react";
 import { fleet } from "@/data/content";
-import { site } from "@/data/site";
+import { site as localSite } from "@/data/site";
+import { getSite } from "@/lib/cms";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, Section, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
@@ -13,8 +14,9 @@ const BOOK_MESSAGE = "Hi, I'd like to book a vehicle for my Kashmir trip";
  * "On the road" — the branded Tempo Traveller (cropped from the company banner)
  * beside the vehicle list from `fleet`. Server component; entrance via Reveal.
  */
-export function Fleet() {
-  const bookHref = whatsappLink(BOOK_MESSAGE);
+export async function Fleet() {
+  const site = await getSite();
+  const bookHref = whatsappLink(site.whatsapp, BOOK_MESSAGE);
 
   return (
     <Section id="fleet" className="overflow-hidden bg-night-2">
@@ -49,7 +51,7 @@ export function Fleet() {
           <Reveal className="lg:sticky lg:top-[calc(var(--header-h)+24px)] lg:col-span-6 lg:self-start xl:col-span-5">
             <figure className="theme-dark group relative isolate aspect-[4/5] overflow-hidden rounded-2xl shadow-soft">
               <Image
-                src={site.banner}
+                src={localSite.banner}
                 alt="Reyaan Trip Holiday's white branded Tempo Traveller van on a mountain road in Kashmir"
                 fill
                 sizes="(min-width: 1280px) 40vw, (min-width: 1024px) 50vw, 100vw"

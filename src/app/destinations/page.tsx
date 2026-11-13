@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { MessageCircle, Mountain } from "lucide-react";
 import type { Region } from "@/types";
-import { destinations, regionLabels } from "@/data/destinations";
+import { regionLabels } from "@/data/labels";
+import { getDestinations, getSite } from "@/lib/cms";
 import { PageHero } from "@/components/shared/PageHero";
 import { CtaBand } from "@/components/shared/CtaBand";
 import { DestinationCard } from "@/components/destinations/DestinationCard";
@@ -31,7 +32,8 @@ const altitudeFormat = new Intl.NumberFormat("en-IN");
 const LG_SPAN: Record<number, string> = { 1: "lg:col-span-1", 2: "lg:col-span-2", 3: "lg:col-span-3" };
 const SM_SPAN: Record<number, string> = { 1: "sm:col-span-1", 2: "sm:col-span-2" };
 
-export default function DestinationsPage() {
+export default async function DestinationsPage() {
+  const [destinations, site] = await Promise.all([getDestinations(), getSite()]);
   return (
     <>
       <PageHero
@@ -141,7 +143,7 @@ export default function DestinationsPage() {
                               Tell us your dates — we&apos;ll shape the route, stays and car.
                             </p>
                             <ButtonLink
-                              href={whatsappLink(`Hi Reyaan Trip Holiday, I'd like to plan a ${label} trip.`)}
+                              href={whatsappLink(site.whatsapp, `Hi Reyaan Trip Holiday, I'd like to plan a ${label} trip.`)}
                               variant="primary"
                               size="md"
                               className="mt-5"

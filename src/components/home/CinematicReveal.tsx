@@ -1,14 +1,10 @@
-import { getDestination } from "@/data/destinations";
+import { getDestinations } from "@/lib/cms";
 import type { Destination } from "@/types";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
 import { RevealPanel } from "./reveal/RevealPanel";
 
 const SHOWCASE = ["srinagar", "ladakh", "gulmarg"] as const;
-
-const showcase: Destination[] = SHOWCASE.map((slug) => getDestination(slug)).filter(
-  (d): d is Destination => Boolean(d),
-);
 
 /**
  * "Cinematic reveal" — three pinned scenes where a giant word knocked out of a navy overlay
@@ -19,7 +15,11 @@ const showcase: Destination[] = SHOWCASE.map((slug) => getDestination(slug)).fil
  * Server component: only the panels hydrate. Each panel arms itself (font measurement +
  * GSAP timeline) when it comes within ~one viewport, during idle time.
  */
-export function CinematicReveal() {
+export async function CinematicReveal() {
+  const destinations = await getDestinations();
+  const showcase: Destination[] = SHOWCASE.map((slug) => destinations.find((d) => d.slug === slug)).filter(
+    (d): d is Destination => Boolean(d),
+  );
   if (showcase.length === 0) return null;
 
   return (

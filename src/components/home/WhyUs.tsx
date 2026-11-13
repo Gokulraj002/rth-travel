@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { whyUs, type WhyUsItem } from "@/data/content";
-import { getDestination } from "@/data/destinations";
+import { getDestination } from "@/lib/cms";
 import { site } from "@/data/site";
 import { Container, Section, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
@@ -65,8 +65,8 @@ function Tile({ children, className }: { children: ReactNode; className?: string
   );
 }
 
-export function WhyUs() {
-  const srinagar = getDestination("srinagar");
+export async function WhyUs() {
+  const srinagar = await getDestination("srinagar");
   const items = whyUs;
   const hasItems = items.length > 0;
 

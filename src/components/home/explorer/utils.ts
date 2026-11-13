@@ -1,6 +1,8 @@
-import type { TourPackage, TripCategory } from "@/types";
-import { getDestination } from "@/data/destinations";
-import { categoryLabels } from "@/data/packages";
+import type { DestinationRef, TourPackage, TripCategory } from "@/types";
+import { categoryLabels } from "@/data/labels";
+
+/** slug → destination (name, photo), built once in PackageExplorer from the server-provided list. */
+export type DestinationLookup = Record<string, DestinationRef>;
 
 /** Price ceiling for the "Under ₹15,000" filter pill. */
 export const BUDGET_CEILING = 15000;
@@ -14,17 +16,17 @@ const AIRPORT_CODES: Record<string, string> = {
 };
 
 /** Mono 3-letter "fare code" for a package, from its first destination. */
-export function packageCode(pkg: TourPackage) {
+export function packageCode(pkg: TourPackage, lookup: DestinationLookup) {
   const first = pkg.destinations[0] ?? "";
   if (AIRPORT_CODES[first]) return AIRPORT_CODES[first];
-  const name = getDestination(first)?.name ?? (first || pkg.title);
+  const name = lookup[first]?.name ?? (first || pkg.title);
   return name.replace(/[^a-z]/gi, "").slice(0, 3).toUpperCase();
 }
 
 /** "Srinagar → Gulmarg → Pahalgam" */
-export function destinationChain(pkg: TourPackage) {
+export function destinationChain(pkg: TourPackage, lookup: DestinationLookup) {
   return pkg.destinations
-    .map((slug) => getDestination(slug)?.name ?? slug.charAt(0).toUpperCase() + slug.slice(1))
+    .map((slug) => lookup[slug]?.name ?? slug.charAt(0).toUpperCase() + slug.slice(1))
     .join(" → ");
 }
 
@@ -34,10 +36,10 @@ export function durationLabel(pkg: TourPackage) {
 }
 
 /** Package image with a safe fallback to the first destination's hero photo. */
-export function packageImage(pkg: TourPackage) {
+export function packageImage(pkg: TourPackage, lookup: DestinationLookup) {
   return (
     pkg.image ||
-    getDestination(pkg.destinations[0] ?? "")?.image ||
+    lookup[pkg.destinations[0] ?? ""]?.image ||
     "/images/destinations/srinagar.jpg"
   );
 }

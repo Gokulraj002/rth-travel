@@ -19,10 +19,9 @@ import {
   type Sprite,
   type SpriteMaterial,
 } from "three";
-import { destinations } from "@/data/destinations";
 import { useJourney } from "@/lib/store";
 import { pad2 } from "@/lib/utils";
-import { ACTIVE, MARKER_IDLE, SURFACE_R, toVec3, useGlowTexture, type RigState } from "./globeShared";
+import { ACTIVE, MARKER_IDLE, SURFACE_R, toVec3, useGlowTexture, type GlobePin, type RigState } from "./globeShared";
 
 const Z = new Vector3(0, 0, 1);
 
@@ -31,15 +30,15 @@ interface MarkerPose {
   quaternion: Quaternion;
 }
 
-function usePoses(): MarkerPose[] {
+function usePoses(stops: GlobePin[]): MarkerPose[] {
   return useMemo(
     () =>
-      destinations.map((d) => {
+      stops.map((d) => {
         const position = toVec3(d.geo.lat, d.geo.lng, SURFACE_R);
         const quaternion = new Quaternion().setFromUnitVectors(Z, position.clone().normalize());
         return { position, quaternion };
       }),
-    [],
+    [stops],
   );
 }
 
@@ -47,8 +46,8 @@ function usePoses(): MarkerPose[] {
  * Destination pins on the globe surface: glowing dot + halo + pulsing ring (+ a light beam
  * for the active one). Must be rendered INSIDE the rotating globe group.
  */
-export default function Markers({ rigRef }: { rigRef: RefObject<RigState> }) {
-  const poses = usePoses();
+export default function Markers({ stops, rigRef }: { stops: GlobePin[]; rigRef: RefObject<RigState> }) {
+  const poses = usePoses(stops);
   const glow = useGlowTexture();
   const n = poses.length;
 
@@ -94,7 +93,7 @@ export default function Markers({ rigRef }: { rigRef: RefObject<RigState> }) {
     const k = Math.pow(MathUtils.clamp((camDist - 1) / 0.55, 1, 6), 0.82);
 
     for (let i = 0; i < n; i++) {
-      const a = (amount.current[i] = MathUtils.damp(amount.current[i], i === active ? 1 : 0, 5, dt));
+      const a = (amount.current[i] = MathUtils.damp(amount.current[i] ?? 0, i === active ? 1 : 0, 5, dt));
 
       const dot = dots.current[i];
       const dm = dotMats.current[i];
@@ -134,7 +133,7 @@ export default function Markers({ rigRef }: { rigRef: RefObject<RigState> }) {
   return (
     <group>
       {poses.map((p, i) => (
-        <group key={destinations[i].slug} position={p.position} quaternion={p.quaternion}>
+        <group key={stops[i].slug} position={p.position} quaternion={p.quaternion}>
           <sprite
             ref={(el) => {
               halos.current[i] = el;
@@ -207,13 +206,13 @@ export default function Markers({ rigRef }: { rigRef: RefObject<RigState> }) {
           </mesh>
         </group>
       ))}
-      <ActiveLabel poses={poses} />
+      <ActiveLabel stops={stops} poses={poses} />
     </group>
   );
 }
 
 /** drei <Html> chip for the active destination only, e.g. "01 SRINAGAR". Hidden when on the far side. */
-function ActiveLabel({ poses }: { poses: MarkerPose[] }) {
+function ActiveLabel({ stops, poses }: { stops: GlobePin[]; poses: MarkerPose[] }) {
   // A selector subscription is fine here: activeIndex changes a handful of times per scroll,
   // and this re-renders only the label (never inside the frame loop).
   const active = useJourney((s) => s.activeIndex);
@@ -231,7 +230,7 @@ function ActiveLabel({ poses }: { poses: MarkerPose[] }) {
     chip.style.opacity = String(MathUtils.clamp((facing - 0.05) * 5, 0, 1));
   });
 
-  const d = active >= 0 ? destinations[active] : undefined;
+  const d = active >= 0 ? stops[active] : undefined;
   if (!d) return null;
   const pose = poses[active];
 

@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { site } from "@/data/site";
+import { getDestinations, getSite } from "@/lib/cms";
 import { Container } from "@/components/ui/primitives";
 import { HeroTitle } from "./hero/HeroTitle";
 import { HeroPlanner } from "./hero/HeroPlanner";
@@ -11,7 +11,7 @@ import { HeroSpace } from "./hero/HeroSpace";
  * Home hero — deep-space navy: a fine starfield, an Earth limb rising from the bottom edge,
  * "H🌍LIDAY" circled by an orbit ring, and a frosted-glass trip planner.
  *
- * Server component; only the trip planner is a client component. All entrances are pure CSS
+ * Server component (reads the CMS); only the trip planner is a client component. All entrances are pure CSS
  * (HeroStyles) and everything is in the server HTML, so nothing above the fold waits for
  * hydration. No images beyond the 22 KB earth texture used by the "O".
  *
@@ -19,7 +19,8 @@ import { HeroSpace } from "./hero/HeroSpace";
  * hero fills the rest of the first screen; on phones it is content height. `--hero-cap` is the
  * visible height of the planet limb; the content's bottom padding keeps the CTAs above it.
  */
-export function HomeHero() {
+export async function HomeHero() {
+  const [site, destinations] = await Promise.all([getSite(), getDestinations()]);
   return (
     <section
       aria-labelledby="home-hero-title"
@@ -61,7 +62,7 @@ export function HomeHero() {
           </HeroFadeUp>
 
           <HeroFadeUp delay={240} className="mt-8 w-full sm:mt-10">
-            <HeroPlanner />
+            <HeroPlanner destinations={destinations.map(({ slug, name }) => ({ slug, name }))} />
           </HeroFadeUp>
 
           <HeroFadeUp

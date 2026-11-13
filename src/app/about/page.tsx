@@ -7,27 +7,29 @@ import { PageHero } from "@/components/shared/PageHero";
 import { Container, Eyebrow, Section, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
 import { whyUs, type WhyUsItem } from "@/data/content";
-import { getDestination, regionLabels } from "@/data/destinations";
-import { site } from "@/data/site";
+import { regionLabels } from "@/data/labels";
+import { getDestinations, getSite } from "@/lib/cms";
 import { pad2 } from "@/lib/utils";
 import type { Destination } from "@/types";
 
-const description = `${site.name} is a local travel team based in Nowgam, Srinagar, planning trips across Kashmir, Ladakh, Katra and Jammu with our own vehicles and local drivers.`;
-
-export const metadata: Metadata = {
-  title: "About Us",
-  description,
-  alternates: { canonical: "/about" },
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    locale: "en_IN",
-    title: `About · ${site.name}`,
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  const description = `${site.name} is a local travel team based in Nowgam, Srinagar, planning trips across Kashmir, Ladakh, Katra and Jammu with our own vehicles and local drivers.`;
+  return {
+    title: "About Us",
     description,
-    url: "/about",
-    images: [{ url: "/images/destinations/srinagar-4.jpg", width: 1600, height: 1067 }],
-  },
-};
+    alternates: { canonical: "/about" },
+    openGraph: {
+      type: "website",
+      siteName: site.name,
+      locale: "en_IN",
+      title: `About · ${site.name}`,
+      description,
+      url: "/about",
+      images: [{ url: "/images/destinations/srinagar-4.jpg", width: 1600, height: 1067 }],
+    },
+  };
+}
 
 const ICONS: Record<WhyUsItem["icon"], LucideIcon> = {
   MapPin,
@@ -86,13 +88,14 @@ const STEPS = [
   },
 ];
 
-const regions = site.destinationsLine
-  .map((name) => getDestination(name.toLowerCase()))
-  .filter((d): d is Destination => Boolean(d));
-
 const values = whyUs.length > 0 ? whyUs : FALLBACK_VALUES;
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [site, destinations] = await Promise.all([getSite(), getDestinations()]);
+  const regions = site.destinationsLine
+    .map((name) => destinations.find((d) => d.slug === name.toLowerCase()))
+    .filter((d): d is Destination => Boolean(d));
+
   return (
     <>
       <PageHero

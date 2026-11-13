@@ -1,10 +1,12 @@
-import { site } from "@/data/site";
+import { getSite } from "@/lib/cms";
+import { absoluteUrl } from "@/lib/utils";
 
 /**
  * Site-wide schema.org TravelAgency structured data.
- * Rendered once from the root layout. All values come from `src/data/site.ts`.
+ * Rendered once from the root layout. Values come from the CMS settings (`getSite()`).
  */
-export function JsonLd() {
+export async function JsonLd() {
+  const site = await getSite();
   const data = {
     "@context": "https://schema.org",
     "@type": "TravelAgency",
@@ -14,8 +16,8 @@ export function JsonLd() {
     description: site.description,
     slogan: site.tagline,
     url: site.url,
-    logo: `${site.url}${site.logo}`,
-    image: [`${site.url}/brand/og-default.jpg`, `${site.url}${site.banner}`],
+    logo: absoluteUrl(site.logo, site.url),
+    image: [absoluteUrl("/brand/og-default.jpg", site.url), absoluteUrl(site.banner, site.url)],
     telephone: site.phones.map((p) => p.raw),
     email: [...site.emails],
     address: {
@@ -33,7 +35,7 @@ export function JsonLd() {
       contactType: "customer service",
       areaServed: "IN",
     })),
-    sameAs: [site.social.instagram, site.social.facebook].filter(Boolean),
+    sameAs: [site.social.instagram, site.social.facebook, site.social.youtube].filter(Boolean),
   };
 
   return (

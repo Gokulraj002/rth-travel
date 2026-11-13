@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ── PHP backend (admin + API) ──
+!.env.example
+!backend/.env.example
+backend/.env
+backend/storage/logs/*
+!backend/storage/logs/.gitkeep
+backend/storage/cache/*
+!backend/storage/cache/.gitkeep
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+!backend/public/uploads/.htaccess
+
+# Packaged uploads (npm run backend:zip)
+/dist/

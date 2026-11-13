@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Compass, Plane } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/primitives";
-import { destinations } from "@/data/destinations";
+import { getDestinations } from "@/lib/cms";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -44,8 +44,8 @@ function EarthZero() {
   );
 }
 
-export default function NotFound() {
-  const popular = destinations.slice(0, 4);
+export default async function NotFound() {
+  const popular = (await getDestinations()).slice(0, 4);
 
   return (
     <section className="relative isolate flex min-h-[calc(100svh-var(--header-h))] items-center overflow-hidden bg-night py-16 sm:py-20">

@@ -8,28 +8,35 @@ import { PageHero } from "@/components/shared/PageHero";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, Eyebrow, Section, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
-import { faqs } from "@/data/content";
-import { site } from "@/data/site";
+import { getDestinations, getFaqs, getPackages, getSite } from "@/lib/cms";
 import { whatsappLink } from "@/lib/utils";
 
-const description = `Plan your Kashmir, Ladakh, Katra or Jammu trip with ${site.name}. Send an enquiry on WhatsApp, call ${site.phones[0].display} or visit us near Nowgam Bypass Chowk, Srinagar.`;
-
-export const metadata: Metadata = {
-  title: "Contact",
-  description,
-  alternates: { canonical: "/contact" },
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    locale: "en_IN",
-    title: `Contact · ${site.name}`,
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  const description = `Plan your Kashmir, Ladakh, Katra or Jammu trip with ${site.name}. Send an enquiry on WhatsApp, call ${site.phones[0].display} or visit us near Nowgam Bypass Chowk, Srinagar.`;
+  return {
+    title: "Contact",
     description,
-    url: "/contact",
-    images: [{ url: "/images/destinations/srinagar-2.jpg", width: 1600, height: 1067 }],
-  },
-};
+    alternates: { canonical: "/contact" },
+    openGraph: {
+      type: "website",
+      siteName: site.name,
+      locale: "en_IN",
+      title: `Contact · ${site.name}`,
+      description,
+      url: "/contact",
+      images: [{ url: "/images/destinations/srinagar-2.jpg", width: 1600, height: 1067 }],
+    },
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const [site, faqs, destinations, packages] = await Promise.all([
+    getSite(),
+    getFaqs(),
+    getDestinations(),
+    getPackages(),
+  ]);
   return (
     <>
       <PageHero
@@ -40,7 +47,7 @@ export default function ContactPage() {
         imageAlt="A shikara gliding across Dal Lake in Srinagar at first light"
       >
         <div className="flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href={whatsappLink(`Hello ${site.name}! I'd like to plan a trip.`)} size="lg">
+          <ButtonLink href={whatsappLink(site.whatsapp, `Hello ${site.name}! I'd like to plan a trip.`)} size="lg">
             <MessageCircle className="size-5" aria-hidden="true" />
             WhatsApp us
           </ButtonLink>
@@ -67,7 +74,18 @@ export default function ContactPage() {
                   A few details are all we need to start. Hit send and your enquiry opens in WhatsApp, ready to go — or
                   send it by email if you prefer.
                 </p>
-                <EnquiryForm />
+                <EnquiryForm
+                  // Only the fields the form needs, to keep the client payload small.
+                  destinations={destinations.map(({ slug, name, region }) => ({ slug, name, region }))}
+                  packages={packages.map(({ slug, title, region, nights, days, destinations: stops }) => ({
+                    slug,
+                    title,
+                    region,
+                    nights,
+                    days,
+                    destinations: stops,
+                  }))}
+                />
               </div>
             </Reveal>
 

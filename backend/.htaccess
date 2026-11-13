@@ -1,0 +1,10 @@
+# Safety net: if this whole backend/ folder is ever uploaded INSIDE public_html,
+# nothing outside public/ may be served (app code, .env, database dumps, logs).
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^public/ - [L]
+  RewriteRule ^ - [F,L]
+</IfModule>
+<IfModule !mod_rewrite.c>
+  Require all denied
+</IfModule>

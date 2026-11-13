@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn, whatsappLink } from "@/lib/utils";
+import { useSite } from "./SiteProvider";
 
 /** WhatsApp brand glyph (lucide ships no brand icons). Decorative — pair with a text label. */
 export function WhatsAppIcon({ className }: { className?: string }) {
@@ -16,6 +17,7 @@ const SHOW_AFTER = 400;
 
 /** Floating WhatsApp button, bottom-right. Fades in after ~400px of scroll. */
 export function WhatsAppFab() {
+  const { whatsapp } = useSite();
   const [visible, setVisible] = useState(false);
   const visibleRef = useRef(false);
 
@@ -63,7 +65,7 @@ export function WhatsAppFab() {
       )}
     >
       <a
-        href={whatsappLink("Hi Reyaan Trip Holiday!")}
+        href={whatsappLink(whatsapp, "Hi Reyaan Trip Holiday!")}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with us on WhatsApp"

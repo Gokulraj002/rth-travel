@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { packages } from "@/data/packages";
+import { getDestinations, getPackages } from "@/lib/cms";
+import { nameMap } from "@/lib/utils";
 import { PageHero } from "@/components/shared/PageHero";
 import { CtaBand } from "@/components/shared/CtaBand";
 import { PackageGrid } from "@/components/packages/PackageGrid";
@@ -18,7 +19,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PackagesPage() {
+export default async function PackagesPage() {
+  const [packages, destinations] = await Promise.all([getPackages(), getDestinations()]);
   return (
     <>
       <PageHero
@@ -32,7 +34,7 @@ export default function PackagesPage() {
       <Section className="pt-12 sm:pt-16">
         <Container>
           <h2 className="sr-only">Browse packages</h2>
-          <PackageGrid packages={packages} />
+          <PackageGrid packages={packages} names={nameMap(destinations)} />
         </Container>
       </Section>
 

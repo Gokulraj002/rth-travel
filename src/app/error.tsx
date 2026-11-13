@@ -5,6 +5,7 @@ import { MessageCircle, RotateCcw, TriangleAlert } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/primitives";
 import { whatsappLink } from "@/lib/utils";
+import { useSite } from "@/components/layout/SiteProvider";
 
 /**
  * Spinning CSS earth used as the first "O" in OOPS. Compositor-only: a 4×-wide strip with the 2:1
@@ -36,6 +37,7 @@ function EarthO() {
 }
 
 export default function RouteError({ error, retry }: { error: unknown; retry: () => void }) {
+  const { whatsapp } = useSite();
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -83,7 +85,7 @@ export default function RouteError({ error, retry }: { error: unknown; retry: ()
             <RotateCcw className="size-4" aria-hidden />
             Try again
           </Button>
-          <ButtonLink href={whatsappLink(helpMessage)} variant="secondary" size="lg">
+          <ButtonLink href={whatsappLink(whatsapp, helpMessage)} variant="secondary" size="lg">
             <MessageCircle className="size-4" aria-hidden />
             Get help on WhatsApp
           </ButtonLink>

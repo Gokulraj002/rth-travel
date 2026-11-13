@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { DetailPageSkeleton } from "@/components/shared/DetailPageSkeleton";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, ArrowUpRight, Check, ChevronRight, X } from "lucide-react";
-import type { TourPackage } from "@/types";
-import { packages, getPackage, categoryLabels } from "@/data/packages";
-import { getDestination, regionLabels } from "@/data/destinations";
-import { site } from "@/data/site";
-import { cn, formatINR, pad2 } from "@/lib/utils";
+import type { Destination, SiteInfo, TourPackage } from "@/types";
+import { categoryLabels, regionLabels } from "@/data/labels";
+import { getDestinations, getPackage, getPackages, getSite } from "@/lib/cms";
+import { absoluteUrl, cn, formatINR, nameMap, pad2 } from "@/lib/utils";
 import { Container, Eyebrow } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
 import { CtaBand } from "@/components/shared/CtaBand";
@@ -20,18 +21,19 @@ const PLACEHOLDER = "__placeholder__";
 /** Skip layout/paint of long below-the-fold blocks until they approach the viewport. Never on the sticky column. */
 const deferRender = "[content-visibility:auto]";
 
-export function generateStaticParams() {
-  // cacheComponents requires at least one entry.
+export async function generateStaticParams() {
+  const packages = await getPackages();
+  // cacheComponents requires at least one entry (the placeholder renders the 404 page).
   if (packages.length === 0) return [{ slug: PLACEHOLDER }];
   return packages.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/packages/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const pkg = getPackage(slug);
+  const [pkg, destinations, site] = await Promise.all([getPackage(slug), getDestinations(), getSite()]);
   if (!pkg) return { title: "Package not found", robots: { index: false } };
 
-  const chain = destinationChain(pkg).join(", ");
+  const chain = destinationChain(pkg, nameMap(destinations)).join(", ");
   const description = `${pkg.nights} nights / ${pkg.days} days · ${chain}. ${pkg.subtitle} From ${formatINR(pkg.priceFrom)} per person.`;
 
   return {
@@ -50,7 +52,7 @@ export async function generateMetadata({ params }: PageProps<"/packages/[slug]">
 }
 
 /** Packages sharing a region or category, best matches first; topped up with others if needed. */
-function relatedPackages(pkg: TourPackage, count = 3) {
+function relatedPackages(pkg: TourPackage, packages: TourPackage[], count = 3) {
   const others = packages.filter((p) => p.slug !== pkg.slug);
   const scored = others
     .map((p, i) => ({
@@ -63,20 +65,15 @@ function relatedPackages(pkg: TourPackage, count = 3) {
   return scored.slice(0, count).map((s) => s.p);
 }
 
-function absoluteUrl(path: string) {
-  return new URL(path, site.url).toString();
-}
-
-function packageJsonLd(pkg: TourPackage) {
-  const stops = pkg.destinations.map((slug) => getDestination(slug)).filter((d) => d !== undefined);
-  const url = absoluteUrl(`/packages/${pkg.slug}`);
+function packageJsonLd(pkg: TourPackage, stops: Destination[], site: SiteInfo) {
+  const url = absoluteUrl(`/packages/${pkg.slug}`, site.url);
   return {
     "@context": "https://schema.org",
     "@type": ["Product", "TouristTrip"],
     "@id": `${url}#trip`,
     name: pkg.title,
     description: pkg.subtitle,
-    image: absoluteUrl(pkg.image),
+    image: absoluteUrl(pkg.image, site.url),
     url,
     category: "Tour package",
     brand: { "@type": "Brand", name: site.name },
@@ -90,7 +87,7 @@ function packageJsonLd(pkg: TourPackage) {
         item: {
           "@type": "TouristDestination",
           name: d.name,
-          url: absoluteUrl(`/destinations/${d.slug}`),
+          url: absoluteUrl(`/destinations/${d.slug}`, site.url),
           geo: { "@type": "GeoCoordinates", latitude: d.geo.lat, longitude: d.geo.lng },
         },
       })),
@@ -113,14 +110,32 @@ function packageJsonLd(pkg: TourPackage) {
   };
 }
 
-export default async function PackagePage({ params }: PageProps<"/packages/[slug]">) {
+export default function PackagePage({ params }: PageProps<"/packages/[slug]">) {
+  // Param-dependent content sits inside <Suspense>: Cache Components may regenerate this route's
+  // static shell at runtime (after a CMS edit), when no slug is known. Known slugs stay fully prerendered.
+  return (
+    <Suspense fallback={<DetailPageSkeleton />}>
+      <PackageContent params={params} />
+    </Suspense>
+  );
+}
+
+async function PackageContent({ params }: { params: PageProps<"/packages/[slug]">["params"] }) {
   const { slug } = await params;
-  const pkg = getPackage(slug);
+  const [pkg, packages, destinations, site] = await Promise.all([
+    getPackage(slug),
+    getPackages(),
+    getDestinations(),
+    getSite(),
+  ]);
   if (!pkg) notFound();
 
-  const stops = pkg.destinations.map((s) => getDestination(s)).filter((d) => d !== undefined);
-  const chain = destinationChain(pkg);
-  const related = relatedPackages(pkg);
+  const names = nameMap(destinations);
+  const stops = pkg.destinations
+    .map((s) => destinations.find((d) => d.slug === s))
+    .filter((d): d is Destination => d !== undefined);
+  const chain = destinationChain(pkg, names);
+  const related = relatedPackages(pkg, packages);
   const bestFor = pkg.categories.map((c) => categoryLabels[c]);
 
   const facts = [
@@ -137,7 +152,7 @@ export default async function PackagePage({ params }: PageProps<"/packages/[slug
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(packageJsonLd(pkg)).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(packageJsonLd(pkg, stops, site)).replace(/</g, "\\u003c") }}
       />
 
       {/* ───────── Hero ───────── */}
@@ -361,7 +376,7 @@ export default async function PackagePage({ params }: PageProps<"/packages/[slug
             <ul className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 [&>li]:min-w-0">
               {related.map((p, i) => (
                 <Reveal as="li" key={p.slug} delay={i * 0.08} className="h-full">
-                  <PackageCard pkg={p} sizes={PACKAGE_CARD_SIZES} />
+                  <PackageCard pkg={p} names={names} sizes={PACKAGE_CARD_SIZES} />
                 </Reveal>
               ))}
             </ul>

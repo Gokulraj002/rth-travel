@@ -99,3 +99,50 @@ export interface Faq {
   q: string;
   a: string;
 }
+
+export interface PhoneNumber {
+  /** Human format, e.g. "+91 60060 45211" */
+  display: string;
+  /** tel: format, e.g. "+916006045211" */
+  raw: string;
+}
+
+export interface PostalAddress {
+  line1: string;
+  line2: string;
+}
+
+/**
+ * Business details. Editable fields come from the CMS settings (see `src/lib/cms.ts`);
+ * `url`, `logo`, `banner`, `shortName`, `taglineParts` and `destinationsLine` always stay local (`src/data/site.ts`).
+ */
+export interface SiteInfo {
+  name: string;
+  shortName: string;
+  tagline: string;
+  taglineParts: readonly string[];
+  description: string;
+  url: string;
+  phones: readonly PhoneNumber[];
+  /** Number used for WhatsApp deep links (digits only, no plus sign) */
+  whatsapp: string;
+  emails: readonly string[];
+  addresses: readonly PostalAddress[];
+  mapQuery: string;
+  destinationsLine: readonly string[];
+  logo: string;
+  banner: string;
+  social: { instagram: string; facebook: string; youtube?: string };
+}
+
+/** The slice of `SiteInfo` that client components need (passed down via `SiteProvider`). */
+export type SiteContact = Pick<SiteInfo, "name" | "whatsapp" | "phones" | "emails" | "addresses">;
+
+/** Destination fields the home-page globe journey (client) renders — keeps its RSC payload small. */
+export type JourneyStop = Pick<
+  Destination,
+  "slug" | "name" | "displayName" | "region" | "tagline" | "geo" | "altitudeM" | "bestTime" | "highlights"
+>;
+
+/** Minimal destination info for client lookups (route names, fallback photos). */
+export type DestinationRef = Pick<Destination, "slug" | "name" | "region" | "image">;

@@ -12,6 +12,13 @@ import { latLngToXYZ } from "@/lib/geo";
 
 export type GlobeTier = "full" | "reduced";
 
+/** A destination pin on the globe (from the CMS, via GlobeJourney → GlobeStage props). */
+export interface GlobePin {
+  slug: string;
+  name: string;
+  geo: { lat: number; lng: number };
+}
+
 /** Mutable per-frame state written by the camera rig, read by other parts (no React renders). */
 export interface RigState {
   /** 0 = intro (whole earth), 1 = focused on a destination. Damped. */

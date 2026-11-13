@@ -2,13 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { TourPackage } from "@/types";
-import { categoryLabels } from "@/data/packages";
-import { getDestination } from "@/data/destinations";
+import { categoryLabels } from "@/data/labels";
 import { cn, formatINR } from "@/lib/utils";
 
-/** Human destination names in visit order, e.g. ["Srinagar", "Gulmarg"]. */
-export function destinationChain(pkg: TourPackage) {
-  return pkg.destinations.map((slug) => getDestination(slug)?.name ?? slug);
+/** Human destination names in visit order, e.g. ["Srinagar", "Gulmarg"]. `names`: slug → name (see `nameMap`). */
+export function destinationChain(pkg: TourPackage, names: Record<string, string>) {
+  return pkg.destinations.map((slug) => names[slug] ?? slug);
 }
 
 /**
@@ -26,9 +25,18 @@ export const PACKAGE_CARD_SIZES_SM2_LG3 = PACKAGE_CARD_SIZES;
  * Standard travel card for a tour package: 4:3 photo on top (only a duration chip over it),
  * white body below with trip types, title, route and price. The whole card links to /packages/{slug}.
  * Works in both server and client trees (no hooks). Images are always lazy — only the page hero preloads.
+ * `names` is a slug → name lookup of the destinations (`nameMap(destinations)`), used for the route line.
  */
-export function PackageCard({ pkg, sizes = PACKAGE_CARD_SIZES }: { pkg: TourPackage; sizes?: string }) {
-  const chain = destinationChain(pkg);
+export function PackageCard({
+  pkg,
+  names,
+  sizes = PACKAGE_CARD_SIZES,
+}: {
+  pkg: TourPackage;
+  names: Record<string, string>;
+  sizes?: string;
+}) {
+  const chain = destinationChain(pkg, names);
   const categories = pkg.categories.slice(0, 3).map((c) => categoryLabels[c]);
 
   return (

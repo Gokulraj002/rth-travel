@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { site } from "@/data/site";
+import { site as localSite } from "@/data/site";
+import { useSite } from "./SiteProvider";
 
 export const PLAN_MSG = "Hi Reyaan Trip Holiday, I'd like to plan a trip";
 
@@ -16,10 +17,11 @@ export function isActive(pathname: string, href: string) {
  * Shared by the navbar and the lazily loaded mobile menu.
  */
 export function Brand({ onClick }: { onClick?: () => void }) {
+  const site = useSite();
   return (
     <Link href="/" onClick={onClick} className="group flex min-h-11 min-w-0 items-center gap-2.5 rounded-lg sm:gap-3">
       <Image
-        src={site.logo}
+        src={localSite.logo}
         alt=""
         width={627}
         height={497}

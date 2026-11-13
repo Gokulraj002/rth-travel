@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import StaticGlobe from "./StaticGlobe";
-import type { GlobeTier } from "./globeShared";
+import type { GlobePin, GlobeTier } from "./globeShared";
 
 /**
  * Cheap CSS stand-in (no image, no JS) sized like the WebGL intro globe: a dark sphere with a
@@ -129,7 +129,7 @@ function onIdle(cb: () => void, timeout = 1000) {
  * never competes with first paint / hydration. Desktop ("full") additionally prefetches the
  * chunk on idle after window load. Rendering pauses while offscreen or the tab is hidden.
  */
-export default function GlobeStage({ className }: { className?: string }) {
+export default function GlobeStage({ className, stops }: { className?: string; stops: GlobePin[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const tier = useTier();
   const webgl = tier === "full" || tier === "reduced";
@@ -192,7 +192,7 @@ export default function GlobeStage({ className }: { className?: string }) {
       ) : (
         <>
           <SceneFallback hide={sceneReady} />
-          {webgl && load ? <GlobeScene tier={tier} active={visible && !hidden} onReady={handleReady} /> : null}
+          {webgl && load ? <GlobeScene tier={tier} stops={stops} active={visible && !hidden} onReady={handleReady} /> : null}
         </>
       )}
     </div>

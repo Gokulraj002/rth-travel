@@ -37,7 +37,24 @@ src/data/           all site content
 src/lib/            helpers (WhatsApp links, INR formatting, geo maths, globe state)
 ```
 
+## Admin panel (PHP + MySQL)
+
+`backend/` holds a small CMS: an admin panel at `admin.yourdomain.com` where the owner edits packages, prices,
+destinations, reviews, FAQs and site settings and reads website enquiries, plus a JSON API (`/api/v1/*`) that
+the website reads from. Saving in the admin panel refreshes the website within seconds.
+
+- **Putting it live on Hostinger (step by step, non-technical):** [`docs/DEPLOY-HOSTINGER.md`](docs/DEPLOY-HOSTINGER.md)
+- **Developer docs (structure, request flow, adding modules, security, local dev):** [`backend/README.md`](backend/README.md)
+
+```bash
+npm run backend:seed   # regenerate backend/database/seed.sql from src/data/*
+npm run backend:dev    # admin + API locally on http://127.0.0.1:8095 (needs PHP 8.2+ and MySQL)
+npm run backend:zip    # build dist/backend.zip to upload to Hostinger
+```
+
 ## Deploy
+
+Hostinger Business (website as a Node.js web app + admin panel + MySQL): see [`docs/DEPLOY-HOSTINGER.md`](docs/DEPLOY-HOSTINGER.md).
 
 Works on Vercel out of the box (`vercel` or import the repo), or any Node host via `npm run build && npm start`.
 

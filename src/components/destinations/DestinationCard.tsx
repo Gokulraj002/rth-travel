@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Mountain } from "lucide-react";
 import type { Destination } from "@/types";
-import { regionLabels } from "@/data/destinations";
+import { regionLabels } from "@/data/labels";
 import { cn, pad2 } from "@/lib/utils";
 
 const altitudeFormat = new Intl.NumberFormat("en-IN");

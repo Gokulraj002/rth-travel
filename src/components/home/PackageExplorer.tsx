@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { ArrowRight, Plane } from "lucide-react";
-import { packages } from "@/data/packages";
+import type { DestinationRef, TourPackage } from "@/types";
 import { Container, Eyebrow, Section } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
 import { useJourney } from "@/lib/store";
@@ -13,7 +13,7 @@ import { FareRow } from "./explorer/FareRow";
 import { PreviewCard } from "./explorer/PreviewCard";
 import { EmptyState } from "./explorer/EmptyState";
 import { useIsDesktop } from "./explorer/useIsDesktop";
-import { applyFilter, buildFilters, type FilterId } from "./explorer/utils";
+import { applyFilter, buildFilters, type DestinationLookup, type FilterId } from "./explorer/utils";
 
 /** Hover-intent delay, so sweeping the mouse down the list doesn't swap (and fetch) every photo. */
 const HOVER_DELAY_MS = 90;
@@ -29,15 +29,21 @@ const HOVER_DELAY_MS = 90;
  * The section uses `overflow-clip` (not `overflow-hidden`, which would make it a scroll
  * container and break the sticky preview); `content-visibility:auto` sits on the fare board
  * only, never on an ancestor of the sticky aside.
+ *
+ * `packages` and `destinations` (name + photo per slug) come from the server parent (CMS).
  */
-export function PackageExplorer() {
+export function PackageExplorer({ packages, destinations }: { packages: TourPackage[]; destinations: DestinationRef[] }) {
   const origin = useJourney((s) => s.origin);
   const isDesktop = useIsDesktop();
   const uid = useId();
   const panelId = `${uid}-panel`;
   const previewId = `${uid}-preview`;
 
-  const filters = useMemo(() => buildFilters(packages), []);
+  const lookup = useMemo<DestinationLookup>(
+    () => Object.fromEntries(destinations.map((d) => [d.slug, d])),
+    [destinations],
+  );
+  const filters = useMemo(() => buildFilters(packages), [packages]);
   const [filterState, setFilterState] = useState<FilterId>("all");
   // Only animate the list after the user has changed the filter (never on first paint).
   const [filterTouched, setFilterTouched] = useState(false);
@@ -46,7 +52,7 @@ export function PackageExplorer() {
     setFilterTouched(true);
   }, []);
   const filter = filters.some((f) => f.id === filterState) ? filterState : "all";
-  const filtered = useMemo(() => applyFilter(packages, filter), [filter]);
+  const filtered = useMemo(() => applyFilter(packages, filter), [packages, filter]);
 
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
@@ -147,6 +153,7 @@ export function PackageExplorer() {
                       <li key={pkg.slug}>
                         <FareRow
                           pkg={pkg}
+                          lookup={lookup}
                           isDesktop={isDesktop}
                           selected={selected?.slug === pkg.slug}
                           expanded={expandedSlug === pkg.slug}
@@ -171,7 +178,7 @@ export function PackageExplorer() {
               aria-label="Selected journey"
               className="hidden lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:block"
             >
-              {selected && <PreviewCard pkg={selected} originCity={origin.city} />}
+              {selected && <PreviewCard pkg={selected} lookup={lookup} originCity={origin.city} />}
             </aside>
           </div>
         )}

@@ -1,18 +1,17 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { MathUtils, Vector3, type Group, type Material, type Mesh, type Object3D, type PerspectiveCamera, type Texture } from "three";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { destinations } from "@/data/destinations";
 import { useJourney } from "@/lib/store";
 import Earth from "./Earth";
 import Atmosphere from "./Atmosphere";
 import Starfield from "./Starfield";
 import Markers from "./Markers";
 import FlightArc from "./FlightArc";
-import { facingRotation, shortestAngle, type GlobeTier, type RigState } from "./globeShared";
+import { facingRotation, shortestAngle, type GlobePin, type GlobeTier, type RigState } from "./globeShared";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,22 +23,34 @@ const INTRO_DIST = 3.4;
 const FOCUS_DIST = 1.55;
 const FOV = 40;
 
-/** Precomputed per-destination targets: globe rotation + a camera angle that varies per step. */
-const FOCUS = destinations.map((d, i) => {
-  const rot = facingRotation(d.geo.lat, d.geo.lng);
-  const side = i % 2 === 0 ? -1 : 1;
-  return {
-    ...rot,
-    az: side * (0.07 + 0.035 * (i % 3)),
-    el: -0.2 - 0.05 * (i % 3),
-  };
-});
+type Focus = ReturnType<typeof facingRotation> & { az: number; el: number };
+
+/** Per-destination targets: globe rotation + a camera angle that varies per step. */
+function focusTargets(stops: GlobePin[]): Focus[] {
+  return stops.map((d, i) => {
+    const rot = facingRotation(d.geo.lat, d.geo.lng);
+    const side = i % 2 === 0 ? -1 : 1;
+    return {
+      ...rot,
+      az: side * (0.07 + 0.035 * (i % 3)),
+      el: -0.2 - 0.05 * (i % 3),
+    };
+  });
+}
 
 /**
  * Camera + globe choreography. Reads `activeIndex` from the store with getState() every frame
  * (no subscriptions in the loop) and eases everything with delta-based damping.
  */
-function Rig({ globeRef, rigRef }: { globeRef: RefObject<Group | null>; rigRef: RefObject<RigState> }) {
+function Rig({
+  globeRef,
+  rigRef,
+  focus,
+}: {
+  globeRef: RefObject<Group | null>;
+  rigRef: RefObject<RigState>;
+  focus: Focus[];
+}) {
   const s = useRef({
     yaw: INTRO.y - 2.4, // start rotated away so India drifts into view on load
     tilt: INTRO.x - 0.15,
@@ -61,7 +72,7 @@ function Rig({ globeRef, rigRef }: { globeRef: RefObject<Group | null>; rigRef: 
     const halfV = Math.tan(MathUtils.degToRad(cam.fov / 2));
 
     const active = useJourney.getState().activeIndex;
-    const f = active >= 0 ? FOCUS[active] : undefined;
+    const f = active >= 0 ? focus[active] : undefined;
 
     let yawT: number, tiltT: number, azT: number, elT: number, distT: number;
     if (f) {
@@ -170,8 +181,9 @@ function Warmup({ onReady }: { onReady: () => void }) {
   return null;
 }
 
-function Scene({ tier, onReady }: { tier: GlobeTier; onReady: () => void }) {
+function Scene({ tier, stops, onReady }: { tier: GlobeTier; stops: GlobePin[]; onReady: () => void }) {
   const globe = useRef<Group>(null);
+  const focus = useMemo(() => focusTargets(stops), [stops]);
   const rigRef = useRef<RigState>({ focus: 0, camDist: INTRO_DIST });
 
   return (
@@ -180,11 +192,11 @@ function Scene({ tier, onReady }: { tier: GlobeTier; onReady: () => void }) {
       <Suspense fallback={null}>
         <group ref={globe} rotation={[INTRO.x - 0.15, INTRO.y - 2.4, 0]}>
           <Earth tier={tier} />
-          <Markers rigRef={rigRef} />
+          <Markers stops={stops} rigRef={rigRef} />
           <FlightArc rigRef={rigRef} />
         </group>
         <Atmosphere segments={tier === "full" ? 64 : 48} />
-        <Rig globeRef={globe} rigRef={rigRef} />
+        <Rig globeRef={globe} rigRef={rigRef} focus={focus} />
         <Warmup onReady={onReady} />
       </Suspense>
     </>
@@ -199,10 +211,12 @@ function Scene({ tier, onReady }: { tier: GlobeTier; onReady: () => void }) {
  */
 export default function GlobeScene({
   tier,
+  stops,
   active,
   onReady,
 }: {
   tier: GlobeTier;
+  stops: GlobePin[];
   active: boolean;
   onReady?: () => void;
 }) {
@@ -230,7 +244,7 @@ export default function GlobeScene({
           requestAnimationFrame(() => ScrollTrigger.refresh());
         }}
       >
-        <Scene tier={tier} onReady={handleReady} />
+        <Scene tier={tier} stops={stops} onReady={handleReady} />
       </Canvas>
     </div>
   );

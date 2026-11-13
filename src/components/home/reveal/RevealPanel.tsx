@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { ArrowRight, CalendarDays, Mountain } from "lucide-react";
 import type { Destination } from "@/types";
-import { regionLabels } from "@/data/destinations";
+import { regionLabels } from "@/data/labels";
 import { ButtonLink } from "@/components/ui/Button";
 import { formatCoords, pad2 } from "@/lib/utils";
 import {

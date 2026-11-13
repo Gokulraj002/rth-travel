@@ -2,9 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
-import { site } from "@/data/site";
-import { destinations } from "@/data/destinations";
-import { packages } from "@/data/packages";
+import { getDestinations, getPackages, getSite } from "@/lib/cms";
 import { whatsappLink } from "@/lib/utils";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/primitives";
@@ -19,7 +17,8 @@ function ColumnTitle({ children }: { children: ReactNode }) {
   return <h2 className="label mb-2 text-accent lg:mb-4">{children}</h2>;
 }
 
-export function Footer() {
+export async function Footer() {
+  const [site, destinations, packages] = await Promise.all([getSite(), getDestinations(), getPackages()]);
   const topPackages = packages.slice(0, 5);
 
   return (
@@ -44,7 +43,7 @@ export function Footer() {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href={whatsappLink("Hi Reyaan Trip Holiday, I'd like to plan a trip")} variant="primary" size="lg">
+            <ButtonLink href={whatsappLink(site.whatsapp, "Hi Reyaan Trip Holiday, I'd like to plan a trip")} variant="primary" size="lg">
               <WhatsAppIcon className="size-5" />
               Chat on WhatsApp
               <span className="sr-only">(opens in a new tab)</span>

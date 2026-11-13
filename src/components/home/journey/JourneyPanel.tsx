@@ -2,8 +2,9 @@
 
 import { ArrowUpRight, MessageCircle } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
-import type { Destination } from "@/types";
-import { destinations, regionLabels } from "@/data/destinations";
+import type { JourneyStop } from "@/types";
+import { regionLabels } from "@/data/labels";
+import { useSite } from "@/components/layout/SiteProvider";
 import { ButtonLink } from "@/components/ui/Button";
 import { LiveConditions } from "@/components/destinations/LiveConditions";
 import { cn, formatCoords, pad2, whatsappLink } from "@/lib/utils";
@@ -65,14 +66,15 @@ function Coords({ lat, lng }: { lat: number; lng: number }) {
   );
 }
 
-function Ctas({ d }: { d: Destination }) {
+function Ctas({ d }: { d: JourneyStop }) {
+  const { whatsapp } = useSite();
   return (
     <div className="flex flex-wrap gap-2">
       <ButtonLink href={`/destinations/${d.slug}`} variant="glass" size="sm">
         Explore {d.name}
         <ArrowUpRight aria-hidden className="size-3.5" />
       </ButtonLink>
-      <ButtonLink href={whatsappLink(planMessage(d.name))} variant="primary" size="sm">
+      <ButtonLink href={whatsappLink(whatsapp, planMessage(d.name))} variant="primary" size="sm">
         <MessageCircle aria-hidden className="size-3.5" />
         Plan this trip
       </ButtonLink>
@@ -81,7 +83,8 @@ function Ctas({ d }: { d: Destination }) {
 }
 
 /** Phone CTAs: 44px tap targets, no backdrop blur, short "Explore" label so both fit at 360px. */
-function MobileCtas({ d }: { d: Destination }) {
+function MobileCtas({ d }: { d: JourneyStop }) {
+  const { whatsapp } = useSite();
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
       <ButtonLink
@@ -94,7 +97,7 @@ function MobileCtas({ d }: { d: Destination }) {
         Explore
         <ArrowUpRight aria-hidden className="size-4" />
       </ButtonLink>
-      <ButtonLink href={whatsappLink(planMessage(d.name))} variant="primary" size="md" className="min-w-0 px-4">
+      <ButtonLink href={whatsappLink(whatsapp, planMessage(d.name))} variant="primary" size="md" className="min-w-0 px-4">
         <MessageCircle aria-hidden className="size-4 shrink-0" />
         Plan this trip
       </ButtonLink>
@@ -103,8 +106,8 @@ function MobileCtas({ d }: { d: Destination }) {
 }
 
 /** Desktop (≥lg) info panel on the right; the display word may spill left over the globe. */
-export function DesktopPanel({ activeIndex }: { activeIndex: number }) {
-  const d = activeIndex >= 0 ? destinations[activeIndex] : undefined;
+export function DesktopPanel({ stops, activeIndex }: { stops: JourneyStop[]; activeIndex: number }) {
+  const d = activeIndex >= 0 ? stops[activeIndex] : undefined;
   return (
     // pt clears the origin chip (top-5, 44px); the stage itself already starts below the header.
     <div className="pointer-events-none absolute inset-y-0 right-0 hidden items-center justify-end pb-10 pr-6 pt-20 lg:flex xl:pr-10">
@@ -170,8 +173,8 @@ const SHEET_MAX_H = "max-h-[calc(45svh_-_max(0.75rem,env(safe-area-inset-bottom)
  * ~45svh: the info block shrinks/clips first, the CTAs never do, and lower-priority rows
  * drop out on short screens.
  */
-export function MobileSheet({ activeIndex }: { activeIndex: number }) {
-  const d = activeIndex >= 0 ? destinations[activeIndex] : undefined;
+export function MobileSheet({ stops, activeIndex }: { stops: JourneyStop[]; activeIndex: number }) {
+  const d = activeIndex >= 0 ? stops[activeIndex] : undefined;
   const fit = ((d?.displayName.length ?? 8) * 0.8).toFixed(2);
 
   return (

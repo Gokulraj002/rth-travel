@@ -3,11 +3,10 @@
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 import { ChevronDown, Minus, Plus, Send } from "lucide-react";
 import { originCities } from "@/data/origins";
-import { destinations } from "@/data/destinations";
-import { site } from "@/data/site";
 import { useJourney } from "@/lib/store";
 import { cn, whatsappLink } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { useSite } from "@/components/layout/SiteProvider";
 
 const MONTHS = [
   "January",
@@ -103,8 +102,14 @@ const optionCls = "bg-surface text-ink";
 /**
  * Flight-search-style trip planner on frosted navy glass. Composes the selections into a WhatsApp message.
  * FROM is bound to the shared journey store, so the globe's flight arc follows it.
+ * `destinations` (slug + name) comes from the server parent (CMS).
+ *
+ * Enquiry saving: this planner only collects month / travellers / destination — no name or phone —
+ * and the CMS enquiries API requires a phone number, so it does NOT post a lead; it only opens WhatsApp.
+ * Only the contact-page EnquiryForm (which has name + phone) saves enquiries.
  */
-export function HeroPlanner() {
+export function HeroPlanner({ destinations }: { destinations: { slug: string; name: string }[] }) {
+  const site = useSite();
   const uid = useId();
   const ids = {
     from: `${uid}-from`,
@@ -116,7 +121,9 @@ export function HeroPlanner() {
 
   const origin = useJourney((s) => s.origin);
   const setOrigin = useJourney((s) => s.setOrigin);
-  const [to, setTo] = useState(DEFAULT_DESTINATION);
+  const [to, setTo] = useState(
+    destinations.some((d) => d.slug === DEFAULT_DESTINATION) ? DEFAULT_DESTINATION : (destinations[0]?.slug ?? ""),
+  );
   const [month, setMonth] = useState("");
   const [travellers, setTravellers] = useState(2);
 
@@ -135,7 +142,7 @@ export function HeroPlanner() {
       `Travellers: ${travellers}`,
       "Please share the best options. Thank you!",
     ].join("\n");
-    window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
+    window.open(whatsappLink(site.whatsapp, message), "_blank", "noopener,noreferrer");
   };
 
   return (

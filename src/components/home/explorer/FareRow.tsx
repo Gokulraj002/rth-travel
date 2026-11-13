@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import type { TourPackage } from "@/types";
 import { cn, formatINR } from "@/lib/utils";
-import { destinationChain, durationLabel, packageCode, packageImage } from "./utils";
+import { destinationChain, durationLabel, packageCode, packageImage, type DestinationLookup } from "./utils";
 import { HighlightList, PackageCtas } from "./PreviewCard";
 
 /**
@@ -18,6 +18,7 @@ import { HighlightList, PackageCtas } from "./PreviewCard";
  */
 export const FareRow = memo(function FareRow({
   pkg,
+  lookup,
   isDesktop,
   selected,
   expanded,
@@ -30,6 +31,7 @@ export const FareRow = memo(function FareRow({
   previewId,
 }: {
   pkg: TourPackage;
+  lookup: DestinationLookup;
   isDesktop: boolean;
   selected: boolean;
   expanded: boolean;
@@ -41,7 +43,7 @@ export const FareRow = memo(function FareRow({
   panelId: string;
   previewId: string;
 }) {
-  const chain = destinationChain(pkg);
+  const chain = destinationChain(pkg, lookup);
   const slug = pkg.slug;
 
   return (
@@ -83,7 +85,7 @@ export const FareRow = memo(function FareRow({
               : "lg:border-line lg:bg-surface-2 lg:text-muted lg:group-hover:text-ink",
           )}
         >
-          {packageCode(pkg)}
+          {packageCode(pkg, lookup)}
         </span>
 
         <span className="min-w-0">
@@ -128,7 +130,7 @@ export const FareRow = memo(function FareRow({
           <div className="grid gap-4 px-4 pb-5 sm:px-5">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-line bg-surface sm:aspect-[16/9]">
               <Image
-                src={packageImage(pkg)}
+                src={packageImage(pkg, lookup)}
                 alt={`${pkg.title} — ${chain}`}
                 fill
                 loading="lazy"

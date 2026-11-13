@@ -4,8 +4,8 @@ import { memo, useId, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronDown, Compass, RotateCcw } from "lucide-react";
 import type { Region, TourPackage, TripCategory } from "@/types";
-import { packages as allPackages, categoryLabels } from "@/data/packages";
-import { regionLabels } from "@/data/destinations";
+import { categoryLabels } from "@/data/labels";
+import { regionLabels } from "@/data/labels";
 import { cn } from "@/lib/utils";
 import { PACKAGE_CARD_SIZES, PackageCard } from "./PackageCard";
 
@@ -40,19 +40,21 @@ const MemoPackageCard = memo(PackageCard);
 
 /**
  * Filter bar + animated grid of PackageCards. Filters live in client state (no useSearchParams).
- * Pass `packages` from a server component; defaults to every package in `src/data/packages.ts`.
+ * Pass `packages` and the destination `names` lookup (`nameMap(destinations)`) from a server component.
  *
  * Perf: nothing animates on first render (`AnimatePresence initial={false}` → server HTML is fully visible);
  * motion layout animations only run on filter/sort changes. Cards are keyed by slug and memoised, and the
  * <ul> stays mounted even when empty, so surviving cards (and their <img>) are never re-mounted.
  */
 export function PackageGrid({
-  packages = allPackages,
+  packages,
+  names,
   initialCategory = "all",
   initialRegion = "all",
   className,
 }: {
-  packages?: TourPackage[];
+  packages: TourPackage[];
+  names: Record<string, string>;
   initialCategory?: TripCategory | "all";
   initialRegion?: Region | "all";
   className?: string;
@@ -214,7 +216,7 @@ export function PackageGrid({
               exit={reduce ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, scale: 0.96, transition: { duration: 0.25 } }}
               transition={reduce ? { duration: 0 } : { duration: 0.6, ease }}
             >
-              <MemoPackageCard pkg={pkg} sizes={PACKAGE_CARD_SIZES} />
+              <MemoPackageCard pkg={pkg} names={names} sizes={PACKAGE_CARD_SIZES} />
             </motion.li>
           ))}
         </AnimatePresence>

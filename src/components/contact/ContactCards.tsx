@@ -1,11 +1,7 @@
 import type { ComponentType, ReactNode } from "react";
 import { ArrowUpRight, Mail, MapPin, MessageCircle, Navigation, Phone } from "lucide-react";
-import { site } from "@/data/site";
+import { getSite } from "@/lib/cms";
 import { cn, pad2, whatsappLink } from "@/lib/utils";
-
-const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(site.mapQuery)}`;
-const whatsappDisplay =
-  site.phones.find((p) => p.raw.replace(/\D/g, "") === site.whatsapp)?.display ?? `+${site.whatsapp}`;
 
 function Card({
   index,
@@ -41,8 +37,13 @@ function Card({
 const linkCls =
   "inline-flex items-center gap-1.5 font-medium text-ink underline-offset-4 transition-colors hover:text-accent hover:underline [overflow-wrap:anywhere]";
 
-/** Call / WhatsApp / Email / Visit cards. All details come from `site.ts`. */
-export function ContactCards({ className }: { className?: string }) {
+/** Call / WhatsApp / Email / Visit cards. All details come from the CMS settings (`getSite()`). */
+export async function ContactCards({ className }: { className?: string }) {
+  const site = await getSite();
+  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(site.mapQuery)}`;
+  const whatsappDisplay =
+    site.phones.find((p) => p.raw.replace(/\D/g, "") === site.whatsapp)?.display ?? `+${site.whatsapp}`;
+
   return (
     <ul className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-1", className)}>
       <Card index={1} label="Call" title="Speak to us" icon={Phone}>
@@ -59,7 +60,7 @@ export function ContactCards({ className }: { className?: string }) {
         <p>Share your dates and plans — the quickest way to get an itinerary going.</p>
         <p>
           <a
-            href={whatsappLink(`Hello ${site.name}! I'd like to plan a trip.`)}
+            href={whatsappLink(site.whatsapp, `Hello ${site.name}! I'd like to plan a trip.`)}
             target="_blank"
             rel="noopener noreferrer"
             className={cn(linkCls, "text-accent")}

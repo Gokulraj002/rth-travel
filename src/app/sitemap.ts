@@ -1,13 +1,14 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/data/site";
-import { destinations } from "@/data/destinations";
-import { packages } from "@/data/packages";
+import { getDestinations, getPackages, getSite } from "@/lib/cms";
+import { absoluteUrl } from "@/lib/utils";
 
 /** Fixed date — cacheComponents forbids request-time `new Date()`. Bump on content releases. */
 const LAST_MODIFIED = "2026-11-11";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const url = (path: string) => `${site.url}${path}`;
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [site, destinations, packages] = await Promise.all([getSite(), getDestinations(), getPackages()]);
+  // Also handles absolute image URLs (CMS uploads).
+  const url = (path: string) => absoluteUrl(path, site.url);
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: url("/"), changeFrequency: "weekly", priority: 1 },

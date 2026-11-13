@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import type { Testimonial } from "@/types";
-import { testimonials } from "@/data/content";
 import { Container, Section, SectionHeading } from "@/components/ui/primitives";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
@@ -82,8 +81,9 @@ function MarqueeRow({ items, reverse }: { items: Testimonial[]; reverse?: boolea
  * toggles `data-offscreen`, CSS sets `animation-play-state`).
  * Under prefers-reduced-motion the marquee is swapped for a static grid via CSS.
  * The marquee is aria-hidden; screen readers get the same list that forms the static grid.
+ * `testimonials` comes from the server parent (CMS).
  */
-export function Testimonials() {
+export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
   const marquee = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

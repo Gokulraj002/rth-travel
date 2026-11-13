@@ -1,0 +1,105 @@
+/* Admin tools — team & roles, message templates, activity log, backup. Loaded on every admin page;
+   generic badges (.rth-role, .rth-act) are safe to reuse, the rest is scoped under .rth-tools-* wrappers. */
+
+/* ── Role badges (used on team list, roles page, form) ─────────────────── */
+.rth-role { font-weight: 600; letter-spacing: .01em; }
+.rth-role-owner    { background: #fdf0d5 !important; color: #8a5a00 !important; }
+.rth-role-manager  { background: #e8e5fb !important; color: #4b3cad !important; }
+.rth-role-sales    { background: #e1f1fb !important; color: #0f5f8f !important; }
+.rth-role-accounts { background: #e3f4ea !important; color: #1d6b3d !important; }
+.rth-role-editor   { background: #eef1f5 !important; color: #4a5a72 !important; }
+
+.rth-tools-narrow { max-width: 46rem; }
+
+/* Role picker on the team form */
+.rth-role-picker { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+.rth-role-option {
+  display: flex; gap: .65rem; align-items: flex-start; padding: .7rem .8rem; margin: 0;
+  border: 1px solid var(--tblr-border-color, #dce1e7); border-radius: .5rem; cursor: pointer; background: var(--tblr-bg-surface, #fff);
+  transition: border-color .15s, box-shadow .15s;
+}
+.rth-role-option .form-check-input { margin-top: .2rem; flex: 0 0 auto; }
+.rth-role-option:hover { border-color: #9fb3cc; }
+.rth-role-option:has(input:checked) { border-color: var(--tblr-primary, #206bc4); box-shadow: 0 0 0 2px rgba(32, 107, 196, .15); }
+.rth-role-option:has(input:focus-visible) { outline: 2px solid var(--tblr-primary, #206bc4); outline-offset: 2px; }
+.rth-role-option.is-locked { cursor: not-allowed; background: #f7f8fa; }
+.rth-role-option.is-locked .rth-role-option-body > .d-block { opacity: .7; }
+.rth-role-option-body { min-width: 0; }
+.rth-role-picker.is-invalid .rth-role-option { border-color: var(--tblr-danger, #d63939); }
+.rth-role-lock {
+  display: inline-flex; align-items: center; gap: .2rem; font-size: .75rem; font-weight: 600;
+  color: #8a5a00; background: #fdf0d5; border-radius: 1rem; padding: .05rem .5rem; text-decoration: none; cursor: pointer;
+}
+.rth-role-lock:hover { background: #fae2ae; color: #6d4700; text-decoration: none; }
+.rth-role-lock .icon { width: .85rem; height: .85rem; }
+
+/* Roles page */
+.rth-tools-roles .rth-role-card-locked { background: #fbfbfc; }
+.rth-tools-roles .rth-menu-chip { font-weight: 500; display: inline-flex; align-items: center; gap: .25rem; }
+.rth-tools-roles .rth-menu-chip .icon { width: .85rem; height: .85rem; }
+.rth-perm-matrix td:first-child { min-width: 14rem; }
+.rth-perm-yes { color: #2f9e44; display: inline-flex; }
+.rth-perm-yes .icon { width: 1.15rem; height: 1.15rem; stroke-width: 2.5; }
+.rth-perm-no { color: #b6bfcc; }
+
+/* ── Message templates ─────────────────────────────────────────────────── */
+.rth-tools-search { max-width: 30rem; }
+.rth-channel { display: inline-flex; align-items: center; justify-content: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; }
+.rth-channel-whatsapp { background: #dcf8c6; color: #128c7e; }
+.rth-channel-email { background: #e1f1fb; color: #0f5f8f; }
+.rth-tools-templates .rth-row-muted td { opacity: .6; }
+.rth-tools-templates .rth-row-muted td:nth-last-child(-n+2) { opacity: 1; }
+.rth-tpl-snippet { max-width: 32rem; white-space: normal; }
+.rth-tools-templates .form-switch .form-check-input { cursor: pointer; }
+
+.rth-tpl-body { font-family: inherit; line-height: 1.5; }
+.rth-tpl-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.rth-tpl-chip {
+  display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0; line-height: 1.15;
+  padding: .3rem .55rem; border: 1px dashed #a9b8cc; border-radius: .4rem; background: #f6f8fb;
+  font-size: .75rem; color: inherit; cursor: pointer; text-align: left;
+}
+.rth-tpl-chip:hover, .rth-tpl-chip:focus-visible { border-style: solid; border-color: var(--tblr-primary, #206bc4); background: #eaf2fc; }
+.rth-tpl-chip code { background: none; padding: 0; font-size: .7rem; color: #5f6f88; }
+.rth-tpl-chip-label { font-weight: 600; }
+
+.rth-tpl-preview-card { position: sticky; top: 1rem; }
+.rth-tpl-phone { border-radius: .75rem; padding: 1rem; min-height: 12rem; }
+.rth-tpl-phone[data-channel="whatsapp"] { background: #ece5dd; }
+.rth-tpl-phone[data-channel="email"] { background: #f4f6fa; border: 1px solid #e3e8ef; }
+.rth-tpl-bubble {
+  white-space: pre-wrap; word-wrap: break-word; font-size: .9rem; line-height: 1.45;
+  background: #fff; border-radius: .6rem; padding: .65rem .8rem; box-shadow: 0 1px 1px rgba(0, 0, 0, .08);
+}
+.rth-tpl-phone[data-channel="whatsapp"] .rth-tpl-bubble { background: #dcf8c6; border-top-right-radius: .15rem; margin-left: 1.5rem; }
+.rth-tpl-subject { font-weight: 600; padding: 0 .1rem .5rem; border-bottom: 1px solid #e3e8ef; margin-bottom: .6rem; }
+
+/* ── Activity log ──────────────────────────────────────────────────────── */
+.rth-act { font-weight: 600; }
+.rth-act-green  { background: #e5f4e3 !important; color: #23711b !important; }
+.rth-act-blue   { background: #e1f1fb !important; color: #0f5f8f !important; }
+.rth-act-red    { background: #fde8e8 !important; color: #b42318 !important; }
+.rth-act-purple { background: #ede7fb !important; color: #5b3cc4 !important; }
+.rth-act-gray   { background: #eef1f5 !important; color: #5f6f88 !important; }
+.rth-act-amber  { background: #fdf0d5 !important; color: #8a5a00 !important; }
+.rth-activity-summary { min-width: 16rem; white-space: normal; }
+.rth-tools-activity .avatar-xs { width: 1.5rem; height: 1.5rem; font-size: .7rem; }
+
+/* ── Backup ────────────────────────────────────────────────────────────── */
+.rth-backup-icon {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 3rem; height: 3rem; border-radius: .75rem; background: #e1f1fb; color: #0f5f8f;
+}
+.rth-backup-icon .icon { width: 1.6rem; height: 1.6rem; }
+.rth-restore-steps { padding-left: 1.2rem; }
+.rth-restore-steps li { margin-bottom: .45rem; }
+.rth-backup-tables { max-height: 22rem; overflow-y: auto; }
+
+@media (max-width: 575.98px) {
+  .rth-role-picker { grid-template-columns: 1fr; }
+  .rth-tpl-preview-card { position: static; }
+}
+
+/* Make the unchecked radio circles in the role picker clearly visible */
+.rth-role-option .form-check-input[type="radio"] { width: 1.05rem; height: 1.05rem; border: 1.5px solid #8d9bb0; background-color: #fff; }
+.rth-role-option .form-check-input[type="radio"]:checked { border-color: var(--tblr-primary, #206bc4); background-color: var(--tblr-primary, #206bc4); }

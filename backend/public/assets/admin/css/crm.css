@@ -1,0 +1,45 @@
+/*
+ * CRM module extras (customers, lead pipeline, follow-ups). Base kanban styles (.rth-kanban*) live in app.css.
+ * Everything here is scoped to .rth-crm-* classes.
+ */
+
+/* Kanban card internals */
+.rth-crm-card { position: relative; }
+.rth-crm-card.is-high { border-left: 3px solid #ef4444; }
+.rth-crm-card .rth-kanban-card-meta { margin-top: 0.2rem; }
+.rth-crm-card .rth-kanban-card-meta .icon { width: 0.95rem; height: 0.95rem; vertical-align: -0.15em; }
+.rth-crm-card.rth-crm-saving { opacity: 0.6; pointer-events: none; }
+.rth-crm-late { color: #b42318 !important; font-weight: 600; }
+.rth-crm-dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; flex: 0 0 auto; }
+.rth-crm-owner { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; max-width: 55%; }
+.rth-crm-move { display: flex; gap: 0.25rem; align-items: center; }
+.rth-crm-move .form-select { width: auto; max-width: 8.5rem; font-size: 0.75rem; padding-top: 0.15rem; padding-bottom: 0.15rem; }
+.rth-crm-js .rth-crm-nojs { display: none; }
+.rth-crm-empty { text-align: center; padding: 1rem 0.5rem; border: 1px dashed #cfd8e3; border-radius: 10px; }
+.rth-crm-empty[hidden] { display: none; }
+
+/* Dialogs (lost reason / won) */
+.rth-crm-dialog { border: 0; padding: 0; border-radius: 12px; width: min(28rem, calc(100vw - 2rem)); box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25); }
+.rth-crm-dialog::backdrop { background: rgba(15, 23, 42, 0.45); }
+
+/* Timeline */
+.rth-crm-timeline-item { display: flex; gap: 0.75rem; padding-bottom: 1rem; position: relative; }
+.rth-crm-timeline-item:not(:last-child)::before { content: ""; position: absolute; left: 0.95rem; top: 2rem; bottom: 0.2rem; width: 2px; background: #e6ebf2; }
+.rth-crm-timeline-icon { flex: 0 0 auto; width: 1.9rem; height: 1.9rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+.rth-crm-timeline-body { min-width: 0; flex: 1 1 auto; }
+.rth-crm-pre { white-space: pre-line; overflow-wrap: anywhere; }
+.rth-crm-log .btn-group .btn { flex: 1 1 auto; }
+
+/* Lost-reason fields on the enquiry page (crm.js hides them unless stage = lost) */
+.rth-crm-lost-fields[hidden] { display: none; }
+
+/* Customer profile */
+.rth-crm-contact .avatar { width: 3.25rem; height: 3.25rem; font-size: 1.25rem; }
+.rth-crm-stat { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+.rth-crm-tag { text-transform: lowercase; }
+
+/* Follow-ups list */
+.rth-crm-task-done .rth-crm-task-title { text-decoration: line-through; color: var(--tblr-secondary, #6b7280); }
+.rth-crm-tabs .badge { margin-left: 0.35rem; }
+
+.rth-crm-unlock { border-style: dashed; }

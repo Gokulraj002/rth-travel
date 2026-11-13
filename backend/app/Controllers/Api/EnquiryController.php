@@ -7,8 +7,11 @@ namespace App\Controllers\Api;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Env;
+use App\Core\License;
 use App\Core\Mailer;
 use App\Core\RateLimiter;
+use App\Repositories\EnquiryRepository;
+use App\Repositories\LeadActivityRepository;
 
 /**
  * POST /api/v1/enquiries — website enquiry form (JSON or form-encoded).
@@ -57,9 +60,36 @@ final class EnquiryController extends Controller
             'user_agent' => $this->request->userAgent() ?: null,
         ]);
 
+        $this->linkCustomer($id);
         $this->notify($id, $data);
 
         $this->json(['ok' => true, 'id' => $id], 201, self::NO_STORE);
+    }
+
+    /**
+     * Paid plans: file the enquiry under a customer (found by phone, else created with source "website")
+     * and start it in the "new" pipeline stage. Best-effort — the public form must never fail because of this.
+     */
+    private function linkCustomer(int $id): void
+    {
+        $customers = License::has('customers');
+        if (!$customers && !License::has('crm')) {
+            return;
+        }
+        try {
+            $lead = EnquiryRepository::find($id);
+            if ($lead === null) {
+                return;
+            }
+            $customerId = null;
+            if ($customers) {
+                $customerId = EnquiryRepository::ensureCustomer(['source' => 'website'] + $lead);
+            }
+            Database::update('enquiries', ['stage' => 'new', 'status' => 'new'], 'id = ?', [$id]);
+            LeadActivityRepository::log($id, $customerId, 'system', 'Enquiry received from website', null);
+        } catch (\Throwable $e) {
+            error_log('[enquiry → customer] #' . $id . ' ' . $e->getMessage());
+        }
     }
 
     /**

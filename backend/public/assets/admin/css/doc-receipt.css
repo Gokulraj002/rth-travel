@@ -1,0 +1,48 @@
+/* Payment receipt + booking voucher (loaded by layouts/print.php; scoped to .rth-receipt / .rth-voucher). */
+
+/* ── Receipt ─────────────────────────────────────────────────────────────── */
+.rth-doc.rth-receipt { min-height: 0; }
+.rth-receipt .rth-receipt-amount {
+  margin: .5rem 0 1.25rem; padding: 1rem 1.25rem; border-radius: 8px;
+  background: linear-gradient(135deg, #f3f7fc 0%, #eef5ec 100%); border: 1px solid var(--rth-line);
+}
+.rth-receipt .rth-receipt-amount .lbl { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--rth-muted); font-weight: 700; }
+.rth-receipt .rth-receipt-amount .amt { font-size: 2rem; font-weight: 800; color: var(--rth-navy); line-height: 1.2; }
+.rth-receipt .rth-receipt-amount .words { font-style: italic; color: var(--rth-ink); }
+.rth-receipt .rth-receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 1.25rem; }
+.rth-receipt .rth-receipt-table th { width: 34%; text-align: left; font-weight: 600; color: var(--rth-muted); padding: .55rem .6rem .55rem 0; border-bottom: 1px dashed var(--rth-line); vertical-align: top; }
+.rth-receipt .rth-receipt-table td { padding: .55rem 0; border-bottom: 1px dashed var(--rth-line); }
+.rth-receipt .rth-receipt-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap-reverse; }
+.rth-receipt .rth-receipt-bottom .rth-doc-totals { margin-left: 0; }
+.rth-receipt .rth-receipt-sign { text-align: center; min-width: 200px; color: var(--rth-ink); }
+.rth-receipt .rth-receipt-sign .line { height: 48px; border-bottom: 1px solid var(--rth-ink); margin-bottom: .35rem; }
+.rth-receipt .rth-receipt-note { margin-top: 1rem; color: #b42318; font-weight: 600; }
+
+/* ── Voucher ─────────────────────────────────────────────────────────────── */
+.rth-voucher .rth-voucher-status { display: inline-block; margin-top: .35rem; padding: .15rem .6rem; border-radius: 999px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; background: #dcfce7; color: #166534; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rth-voucher .rth-voucher-status.is-pending { background: #fff4e5; color: #b45309; }
+.rth-voucher .rth-voucher-status.is-cancelled { background: #fee2e2; color: #b42318; }
+.rth-voucher .rth-voucher-greet { margin: 0 0 1rem; }
+.rth-voucher .rth-voucher-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; margin-bottom: .6rem; }
+.rth-voucher .rth-voucher-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rth-voucher .rth-voucher-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--rth-muted); font-weight: 700; }
+.rth-voucher .rth-voucher-value { font-weight: 700; color: var(--rth-navy); margin-top: .1rem; }
+.rth-voucher .rth-voucher-sub { font-size: .8rem; color: var(--rth-muted); }
+.rth-voucher .rth-voucher-pre { white-space: pre-line; }
+.rth-voucher .rth-voucher-days { list-style: none; padding: 0; margin: 0; }
+.rth-voucher .rth-voucher-days li { display: flex; gap: .9rem; padding: .55rem 0; border-bottom: 1px solid var(--rth-line); break-inside: avoid; page-break-inside: avoid; }
+.rth-voucher .rth-voucher-day { flex: 0 0 78px; text-align: center; border-radius: 6px; background: var(--rth-navy); color: #fff; padding: .35rem .25rem; align-self: flex-start; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rth-voucher .rth-voucher-day .d { display: block; font-weight: 800; font-size: .85rem; }
+.rth-voucher .rth-voucher-day .dt { display: block; font-size: .7rem; opacity: .85; }
+.rth-voucher .rth-voucher-daybody .t { font-weight: 700; color: var(--rth-navy); }
+.rth-voucher .rth-voucher-daybody .desc { font-size: .86rem; color: var(--rth-ink); }
+.rth-voucher .rth-voucher-daybody .stay { font-size: .8rem; color: var(--rth-muted); margin-top: .15rem; }
+.rth-voucher .rth-voucher-list { padding-left: 1.1rem; margin: 0; font-size: .86rem; }
+.rth-voucher .rth-voucher-list li { margin-bottom: .2rem; }
+.rth-voucher .rth-voucher-list.is-in li::marker { content: "✓  "; color: #2fb344; }
+.rth-voucher .rth-voucher-list.is-out li::marker { content: "✕  "; color: #b42318; }
+
+@media (max-width: 640px) {
+  .rth-voucher .rth-voucher-grid, .rth-voucher .rth-voucher-grid-2 { grid-template-columns: 1fr; }
+  .rth-receipt .rth-receipt-bottom { flex-direction: column-reverse; align-items: stretch; }
+}

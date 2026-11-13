@@ -15,6 +15,7 @@ use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\DestinationController;
 use App\Controllers\Admin\EnquiryController;
 use App\Controllers\Admin\FaqController;
+use App\Controllers\Admin\LicenseController;
 use App\Controllers\Admin\MediaController;
 use App\Controllers\Admin\PackageController;
 use App\Controllers\Admin\ProfileController;
@@ -37,57 +38,57 @@ $router->post('/setup', [AuthController::class, 'setup']);
 $router->get('/', [DashboardController::class, 'index'], ['auth']);
 
 // ── Packages ──────────────────────────────────────────────────────────────────
-$router->get('/packages', [PackageController::class, 'index'], ['auth']);
-$router->get('/packages/create', [PackageController::class, 'create'], ['auth']);
-$router->post('/packages', [PackageController::class, 'store'], ['auth']);
-$router->post('/packages/reorder', [PackageController::class, 'reorder'], ['auth']);          // JSON {ids:[…]} + X-CSRF-Token
-$router->get('/packages/{id}/edit', [PackageController::class, 'edit'], ['auth']);
-$router->put('/packages/{id}', [PackageController::class, 'update'], ['auth']);
-$router->delete('/packages/{id}', [PackageController::class, 'destroy'], ['auth']);
-$router->post('/packages/{id}/duplicate', [PackageController::class, 'duplicate'], ['auth']);
-$router->post('/packages/{id}/toggle', [PackageController::class, 'toggle'], ['auth']);       // publish ⇄ draft
+$router->get('/packages', [PackageController::class, 'index'], ['auth', 'can:website']);
+$router->get('/packages/create', [PackageController::class, 'create'], ['auth', 'can:website']);
+$router->post('/packages', [PackageController::class, 'store'], ['auth', 'can:website']);
+$router->post('/packages/reorder', [PackageController::class, 'reorder'], ['auth', 'can:website']);          // JSON {ids:[…]} + X-CSRF-Token
+$router->get('/packages/{id}/edit', [PackageController::class, 'edit'], ['auth', 'can:website']);
+$router->put('/packages/{id}', [PackageController::class, 'update'], ['auth', 'can:website']);
+$router->delete('/packages/{id}', [PackageController::class, 'destroy'], ['auth', 'can:website']);
+$router->post('/packages/{id}/duplicate', [PackageController::class, 'duplicate'], ['auth', 'can:website']);
+$router->post('/packages/{id}/toggle', [PackageController::class, 'toggle'], ['auth', 'can:website']);       // publish ⇄ draft
 
 // ── Destinations ──────────────────────────────────────────────────────────────
-$router->get('/destinations', [DestinationController::class, 'index'], ['auth']);
-$router->get('/destinations/create', [DestinationController::class, 'create'], ['auth']);
-$router->post('/destinations', [DestinationController::class, 'store'], ['auth']);
-$router->post('/destinations/reorder', [DestinationController::class, 'reorder'], ['auth']);
-$router->get('/destinations/{id}/edit', [DestinationController::class, 'edit'], ['auth']);
-$router->put('/destinations/{id}', [DestinationController::class, 'update'], ['auth']);
-$router->delete('/destinations/{id}', [DestinationController::class, 'destroy'], ['auth']);
-$router->post('/destinations/{id}/toggle', [DestinationController::class, 'toggle'], ['auth']);
+$router->get('/destinations', [DestinationController::class, 'index'], ['auth', 'can:website']);
+$router->get('/destinations/create', [DestinationController::class, 'create'], ['auth', 'can:website']);
+$router->post('/destinations', [DestinationController::class, 'store'], ['auth', 'can:website']);
+$router->post('/destinations/reorder', [DestinationController::class, 'reorder'], ['auth', 'can:website']);
+$router->get('/destinations/{id}/edit', [DestinationController::class, 'edit'], ['auth', 'can:website']);
+$router->put('/destinations/{id}', [DestinationController::class, 'update'], ['auth', 'can:website']);
+$router->delete('/destinations/{id}', [DestinationController::class, 'destroy'], ['auth', 'can:website']);
+$router->post('/destinations/{id}/toggle', [DestinationController::class, 'toggle'], ['auth', 'can:website']);
 
 // ── Enquiries (leads) ─────────────────────────────────────────────────────────
-$router->get('/enquiries', [EnquiryController::class, 'index'], ['auth']);
-$router->get('/enquiries/export', [EnquiryController::class, 'export'], ['auth']);            // CSV download
-$router->get('/enquiries/{id}', [EnquiryController::class, 'show'], ['auth']);
-$router->put('/enquiries/{id}', [EnquiryController::class, 'update'], ['auth']);              // status + notes
-$router->delete('/enquiries/{id}', [EnquiryController::class, 'destroy'], ['auth']);
+$router->get('/enquiries', [EnquiryController::class, 'index'], ['auth', 'can:enquiries']);
+$router->get('/enquiries/export', [EnquiryController::class, 'export'], ['auth', 'can:enquiries']);            // CSV download
+$router->get('/enquiries/{id}', [EnquiryController::class, 'show'], ['auth', 'can:enquiries']);
+$router->put('/enquiries/{id}', [EnquiryController::class, 'update'], ['auth', 'can:enquiries']);              // status + notes
+$router->delete('/enquiries/{id}', [EnquiryController::class, 'destroy'], ['auth', 'can:enquiries']);
 
 // ── Testimonials ──────────────────────────────────────────────────────────────
-$router->get('/testimonials', [TestimonialController::class, 'index'], ['auth']);
-$router->get('/testimonials/create', [TestimonialController::class, 'create'], ['auth']);
-$router->post('/testimonials', [TestimonialController::class, 'store'], ['auth']);
-$router->post('/testimonials/reorder', [TestimonialController::class, 'reorder'], ['auth']);
-$router->get('/testimonials/{id}/edit', [TestimonialController::class, 'edit'], ['auth']);
-$router->put('/testimonials/{id}', [TestimonialController::class, 'update'], ['auth']);
-$router->delete('/testimonials/{id}', [TestimonialController::class, 'destroy'], ['auth']);
+$router->get('/testimonials', [TestimonialController::class, 'index'], ['auth', 'can:website']);
+$router->get('/testimonials/create', [TestimonialController::class, 'create'], ['auth', 'can:website']);
+$router->post('/testimonials', [TestimonialController::class, 'store'], ['auth', 'can:website']);
+$router->post('/testimonials/reorder', [TestimonialController::class, 'reorder'], ['auth', 'can:website']);
+$router->get('/testimonials/{id}/edit', [TestimonialController::class, 'edit'], ['auth', 'can:website']);
+$router->put('/testimonials/{id}', [TestimonialController::class, 'update'], ['auth', 'can:website']);
+$router->delete('/testimonials/{id}', [TestimonialController::class, 'destroy'], ['auth', 'can:website']);
 
 // ── FAQs ──────────────────────────────────────────────────────────────────────
-$router->get('/faqs', [FaqController::class, 'index'], ['auth']);
-$router->get('/faqs/create', [FaqController::class, 'create'], ['auth']);
-$router->post('/faqs', [FaqController::class, 'store'], ['auth']);
-$router->post('/faqs/reorder', [FaqController::class, 'reorder'], ['auth']);
-$router->get('/faqs/{id}/edit', [FaqController::class, 'edit'], ['auth']);
-$router->put('/faqs/{id}', [FaqController::class, 'update'], ['auth']);
-$router->delete('/faqs/{id}', [FaqController::class, 'destroy'], ['auth']);
+$router->get('/faqs', [FaqController::class, 'index'], ['auth', 'can:website']);
+$router->get('/faqs/create', [FaqController::class, 'create'], ['auth', 'can:website']);
+$router->post('/faqs', [FaqController::class, 'store'], ['auth', 'can:website']);
+$router->post('/faqs/reorder', [FaqController::class, 'reorder'], ['auth', 'can:website']);
+$router->get('/faqs/{id}/edit', [FaqController::class, 'edit'], ['auth', 'can:website']);
+$router->put('/faqs/{id}', [FaqController::class, 'update'], ['auth', 'can:website']);
+$router->delete('/faqs/{id}', [FaqController::class, 'destroy'], ['auth', 'can:website']);
 
 // ── Site settings, media, website refresh ─────────────────────────────────────
-$router->get('/settings', [SettingController::class, 'edit'], ['auth']);
-$router->put('/settings', [SettingController::class, 'update'], ['auth']);
-$router->get('/media', [MediaController::class, 'index'], ['auth']);                          // JSON list for the picker
-$router->post('/media/upload', [MediaController::class, 'upload'], ['auth']);                 // multipart, returns JSON {path,url}
-$router->post('/site/refresh', [SiteController::class, 'refresh'], ['auth']);                 // manual "update website now"
+$router->get('/settings', [SettingController::class, 'edit'], ['auth', 'can:settings']);
+$router->put('/settings', [SettingController::class, 'update'], ['auth', 'can:settings']);
+$router->get('/media', [MediaController::class, 'index'], ['auth', 'can:website']);                          // JSON list for the picker
+$router->post('/media/upload', [MediaController::class, 'upload'], ['auth', 'can:website']);                 // multipart, returns JSON {path,url}
+$router->post('/site/refresh', [SiteController::class, 'refresh'], ['auth', 'can:website']);                 // manual "update website now"
 
 // ── Admin users (owner only) + own profile ────────────────────────────────────
 $router->get('/users', [UserController::class, 'index'], ['auth', 'owner']);
@@ -112,3 +113,13 @@ $router->get('/api/v1/faqs', [ApiContent::class, 'faqs'], ['api']);
 $router->get('/api/v1/settings', [ApiContent::class, 'settings'], ['api']);
 $router->post('/api/v1/enquiries', [ApiEnquiry::class, 'store'], ['api']);
 $router->options('/api/v1/enquiries', [ApiEnquiry::class, 'store'], ['api']);
+
+// ── Plan & license (owner only) ───────────────────────────────────────────────
+$router->get('/license', [LicenseController::class, 'index'], ['auth', 'owner']);
+$router->put('/license', [LicenseController::class, 'update'], ['auth', 'owner']);
+$router->delete('/license', [LicenseController::class, 'destroy'], ['auth', 'owner']);
+
+// ── Module route files (one per module: app/routes/crm.php, bookings.php, …) ──
+foreach (glob(APP_PATH . '/routes/*.php') ?: [] as $moduleRoutes) {
+    require $moduleRoutes;
+}

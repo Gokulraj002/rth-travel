@@ -1,0 +1,73 @@
+/* Quotation document (A4) — admin print view + public share page /q/{token}. Builds on assets/admin/print.css. */
+.rth-qdoc { position: relative; }
+.rth-qdoc-banner { margin: -4mm 0 6mm; padding: .6rem .9rem; border-radius: 6px; font-weight: 600; font-size: .9rem; display: flex; gap: .4rem; align-items: center; }
+.rth-qdoc-banner.is-expired { background: #fff4e5; color: #9a3412; border: 1px solid #fed7aa; }
+.rth-qdoc-banner.is-accepted { background: #ecfdf3; color: #166534; border: 1px solid #bbf7d0; }
+.rth-qdoc-banner .icon { width: 1.1rem; height: 1.1rem; }
+
+.rth-qdoc-hero { background: linear-gradient(120deg, var(--rth-navy) 0%, #17406f 100%); color: #fff; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; position: relative; overflow: hidden; }
+.rth-qdoc-hero::after { content: ""; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; border-radius: 50%; border: 18px solid rgba(200, 162, 74, .35); }
+.rth-qdoc-kicker { font-size: .7rem; text-transform: uppercase; letter-spacing: .14em; color: var(--rth-gold); font-weight: 800; }
+.rth-qdoc-trip { font-size: 1.45rem; font-weight: 800; line-height: 1.2; margin-top: .15rem; position: relative; z-index: 1; }
+
+.rth-qdoc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+.rth-qdoc-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--rth-muted); font-weight: 700; margin-bottom: .3rem; }
+.rth-qdoc-strong { font-weight: 700; font-size: 1.05rem; color: var(--rth-navy); }
+.rth-qdoc-facts { margin: 0; }
+.rth-qdoc-facts > div { display: flex; gap: .75rem; padding: .12rem 0; }
+.rth-qdoc-facts dt { width: 92px; flex: 0 0 auto; color: var(--rth-muted); font-weight: 500; }
+.rth-qdoc-facts dd { margin: 0; font-weight: 600; }
+
+/* Itinerary timeline */
+.rth-qdoc-timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.rth-qdoc-timeline::before { content: ""; position: absolute; left: 31px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--rth-gold), rgba(200, 162, 74, .2));
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rth-qdoc-timeline li { display: flex; gap: .9rem; padding: .45rem 0; position: relative; break-inside: avoid; page-break-inside: avoid; }
+.rth-qdoc-day { flex: 0 0 64px; height: 26px; border-radius: 13px; background: var(--rth-navy); color: #fff; font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+  display: flex; align-items: center; justify-content: center; text-transform: uppercase; position: relative; z-index: 1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rth-qdoc-daybody { flex: 1 1 auto; min-width: 0; border-bottom: 1px dashed var(--rth-line); padding-bottom: .5rem; }
+.rth-qdoc-timeline li:last-child .rth-qdoc-daybody { border-bottom: 0; }
+.rth-qdoc-daytitle { font-weight: 700; color: var(--rth-navy); }
+.rth-qdoc-daytext { color: #374151; font-size: .9rem; margin-top: .15rem; }
+.rth-qdoc-stay { margin-top: .3rem; font-size: .8rem; color: var(--rth-muted); display: flex; gap: .3rem; align-items: center; }
+.rth-qdoc-stay .icon { width: 1rem; height: 1rem; color: var(--rth-gold); }
+
+/* Prices */
+.rth-qdoc-prices { break-inside: auto; }
+.rth-qdoc-prices tr { break-inside: avoid; page-break-inside: avoid; }
+.rth-qdoc-type { font-size: .72rem; color: var(--rth-muted); text-transform: uppercase; letter-spacing: .04em; }
+.rth-qdoc-totalwrap { display: flex; gap: 1.5rem; align-items: flex-start; justify-content: space-between; margin-top: .75rem; break-inside: avoid; page-break-inside: avoid; }
+.rth-qdoc-words { flex: 1 1 auto; font-size: .85rem; font-style: italic; color: #374151; padding-top: .3rem; }
+.rth-qdoc-totalwrap .rth-doc-totals { flex: 0 0 300px; }
+.rth-qdoc-discount span:last-child { color: #15803d; }
+
+/* Inclusions / exclusions */
+.rth-qdoc-incl { break-inside: avoid; page-break-inside: avoid; }
+.rth-qdoc-list { list-style: none; margin: 0; padding: 0; }
+.rth-qdoc-list li { display: flex; gap: .45rem; align-items: flex-start; padding: .18rem 0; font-size: .9rem; }
+.rth-qdoc-list .icon { width: 1rem; height: 1rem; flex: 0 0 auto; margin-top: .15rem; stroke-width: 3; }
+.rth-qdoc-list.is-in .icon { color: #15803d; }
+.rth-qdoc-list.is-out .icon { color: #b91c1c; }
+
+.rth-qdoc-terms { margin: 0; padding-left: 1.1rem; font-size: .85rem; color: #374151; }
+.rth-qdoc-terms li { padding: .1rem 0; }
+.rth-qdoc-pay { break-inside: avoid; page-break-inside: avoid; display: flex; flex-wrap: wrap; gap: .5rem 2rem; align-items: flex-start; }
+.rth-qdoc-upi { font-size: .95rem; }
+.rth-qdoc-foot { text-align: center; }
+.rth-qdoc-thanks { font-weight: 800; color: var(--rth-navy); font-size: 1rem; margin-bottom: .2rem; }
+
+@media (max-width: 640px) {
+  .rth-doc.rth-qdoc { padding: 6mm 5mm 10mm; }
+  .rth-qdoc .rth-doc-head { flex-direction: column; }
+  .rth-qdoc .rth-doc-title { text-align: left; }
+  .rth-qdoc-grid { grid-template-columns: 1fr; }
+  .rth-qdoc-totalwrap { flex-direction: column-reverse; }
+  .rth-qdoc-totalwrap .rth-doc-totals { flex-basis: auto; width: 100%; }
+  .rth-qdoc-day { flex-basis: 54px; }
+  .rth-qdoc-timeline::before { left: 26px; }
+}
+@media print {
+  .rth-qdoc-banner { margin-top: 0; }
+  .rth-qdoc h2 { break-after: avoid; page-break-after: avoid; }
+}

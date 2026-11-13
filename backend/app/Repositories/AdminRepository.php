@@ -9,9 +9,10 @@ use App\Core\Database;
 /** Admin panel user accounts. Never select password_hash unless it is needed. */
 final class AdminRepository
 {
-    public const ROLES = ['owner' => 'Owner', 'editor' => 'Editor'];
+    /** Role labels (kept for older views; the source of truth is config/permissions.php via Gate). */
+    public const ROLES = ['owner' => 'Owner', 'manager' => 'Manager', 'sales' => 'Sales', 'accounts' => 'Accounts', 'editor' => 'Editor'];
 
-    private const COLUMNS = 'id, name, email, role, is_active, last_login_at, created_at, updated_at';
+    private const COLUMNS = 'id, name, email, phone, role, is_active, last_login_at, created_at, updated_at';
 
     /** @return list<array<string,mixed>> */
     public static function all(): array
@@ -48,22 +49,43 @@ final class AdminRepository
         );
     }
 
-    /** @param array{name:string,email:string,role:string,is_active:int} $data */
+    /** id => name for filters / dropdowns (all admins, active first). @return array<int,string> */
+    public static function options(): array
+    {
+        $out = [];
+        foreach (Database::fetchAll('SELECT id, name FROM admins ORDER BY is_active DESC, name ASC, id ASC') as $r) {
+            $out[(int) $r['id']] = (string) $r['name'];
+        }
+        return $out;
+    }
+
+    /** Number of admins per role. @return array<string,int> */
+    public static function countByRole(): array
+    {
+        $out = [];
+        foreach (Database::fetchAll('SELECT role, COUNT(*) AS n FROM admins GROUP BY role') as $r) {
+            $out[(string) $r['role']] = (int) $r['n'];
+        }
+        return $out;
+    }
+
+    /** @param array{name:string,email:string,phone?:?string,role:string,is_active:int} $data */
     public static function create(array $data, string $password): int
     {
         return Database::insert('admins', [
             'name' => $data['name'],
             'email' => mb_strtolower($data['email']),
+            'phone' => $data['phone'] ?? null,
             'role' => $data['role'],
             'is_active' => $data['is_active'],
             'password_hash' => password_hash($password, PASSWORD_DEFAULT),
         ]);
     }
 
-    /** @param array<string,mixed> $data name/email/role/is_active (any subset) */
+    /** @param array<string,mixed> $data name/email/phone/role/is_active (any subset) */
     public static function update(int $id, array $data): void
     {
-        $allowed = array_intersect_key($data, array_flip(['name', 'email', 'role', 'is_active']));
+        $allowed = array_intersect_key($data, array_flip(['name', 'email', 'phone', 'role', 'is_active']));
         if (isset($allowed['email'])) {
             $allowed['email'] = mb_strtolower((string) $allowed['email']);
         }

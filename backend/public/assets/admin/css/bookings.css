@@ -1,0 +1,108 @@
+/* Bookings, payments & trip calendar — scoped under .rth-bookings (loaded on every admin page). */
+
+/* ── Shared ───────────────────────────────────────────────────────────────── */
+.rth-bookings .rth-bk-hint {
+  display: inline-block; margin-left: .35rem; padding: 0 .45rem; border-radius: 999px;
+  font-size: .72rem; font-weight: 600; line-height: 1.5; white-space: nowrap;
+  background: #eef2f7; color: #475569;
+}
+.rth-bookings .rth-bk-hint.is-today { background: #fde68a; color: #7c4a03; }
+.rth-bookings .rth-bk-hint.is-soon { background: #fff4e5; color: #b45309; }
+.rth-bookings .rth-bk-hint.is-later { background: #eef2f7; color: #475569; }
+.rth-bookings .rth-bk-hint.is-ongoing { background: #dcfce7; color: #166534; }
+.rth-bookings .rth-bk-hint.is-done { background: transparent; color: #94a3b8; padding-left: 0; }
+.rth-bookings .rth-bk-pre { white-space: pre-line; }
+.rth-bookings .rth-bk-trip { max-width: 16rem; }
+.rth-bookings .rth-bk-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+.rth-bookings .rth-bk-tabs .nav-link { white-space: nowrap; }
+.rth-bookings .rth-bk-dl dt { font-weight: 500; color: var(--tblr-secondary, #64748b); }
+.rth-bookings .rth-bk-dl dd { margin-bottom: .6rem; }
+.rth-bookings .rth-bk-progress { height: .5rem; }
+.rth-bookings .rth-bk-progress.is-lg { height: .75rem; border-radius: 999px; }
+.rth-bookings .rth-bk-payform { background: #f8fafc; }
+.rth-bookings .rth-bk-newcustomer { border-top: 1px dashed rgba(0, 48, 96, .15); padding-top: .75rem; }
+.rth-bookings .rth-bk-newcustomer.is-hidden { display: none; }
+.rth-bookings .rth-bk-traveller .form-control, .rth-bookings .rth-bk-traveller .form-select { font-size: .875rem; }
+
+/* Payments list */
+.rth-bookings .rth-pay-methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .6rem 1.25rem; }
+.rth-bookings .rth-pay-method .progress { margin-top: .25rem; }
+.rth-bookings .rth-pay-bar-upi { background: #6d28d9; }
+.rth-bookings .rth-pay-bar-cash { background: #3ca830; }
+.rth-bookings .rth-pay-bar-bank { background: #003060; }
+.rth-bookings .rth-pay-bar-card { background: #0ea5e9; }
+.rth-bookings .rth-pay-bar-cheque { background: #c8a24a; }
+.rth-bookings .rth-pay-bar-other { background: #94a3b8; }
+.rth-bookings .rth-pay-total td { background: #f1f5f9; border-top: 2px solid #cbd5e1; }
+
+/* ── Trip calendar ────────────────────────────────────────────────────────── */
+.rth-cal { --cal-line: #e5e9f0; --cal-pending: #f59f00; --cal-confirmed: #1d63c9; --cal-ongoing: #2fb344; --cal-completed: #8a97ab; --cal-task: #f76707; }
+.rth-cal .rth-cal-legend { display: flex; flex-wrap: wrap; gap: .25rem .9rem; }
+.rth-cal .rth-cal-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.rth-cal .rth-cal-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 3px; flex: none; }
+.rth-cal .s-pending.rth-cal-dot, .rth-cal .rth-cal-bar.s-pending { background: var(--cal-pending); }
+.rth-cal .s-confirmed.rth-cal-dot, .rth-cal .rth-cal-bar.s-confirmed { background: var(--cal-confirmed); }
+.rth-cal .s-ongoing.rth-cal-dot, .rth-cal .rth-cal-bar.s-ongoing { background: var(--cal-ongoing); }
+.rth-cal .s-completed.rth-cal-dot, .rth-cal .rth-cal-bar.s-completed { background: var(--cal-completed); }
+.rth-cal .s-task.rth-cal-dot { background: var(--cal-task); border-radius: 50%; }
+
+.rth-cal .rth-cal-card { overflow: hidden; }
+.rth-cal .rth-cal-head { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: #f6f8fb; border-bottom: 1px solid var(--cal-line); }
+.rth-cal .rth-cal-head div { padding: .5rem .6rem; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #64748b; }
+.rth-cal .rth-cal-week { position: relative; min-height: 7.25rem; border-bottom: 1px solid var(--cal-line); }
+.rth-cal .rth-cal-week:last-child { border-bottom: 0; }
+.rth-cal .rth-cal-bg { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.rth-cal .rth-cal-bg div { border-right: 1px solid var(--cal-line); }
+.rth-cal .rth-cal-bg div:last-child { border-right: 0; }
+.rth-cal .rth-cal-bg .is-weekend { background: #fbfcfe; }
+.rth-cal .rth-cal-bg .is-out { background: #f6f7f9; }
+.rth-cal .rth-cal-bg .is-today { background: #eef5ff; box-shadow: inset 0 0 0 2px #84a8cc; }
+.rth-cal .rth-cal-fg {
+  position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-flow: row dense; grid-auto-rows: minmax(1.5rem, auto); row-gap: 3px; padding-bottom: .5rem;
+}
+.rth-cal .rth-cal-num { grid-row: 1; padding: .3rem .5rem .15rem; font-size: .82rem; font-weight: 600; color: #334155; }
+.rth-cal .rth-cal-num.is-out { color: #a0aec0; font-weight: 500; }
+.rth-cal .rth-cal-num.is-today span { display: inline-flex; align-items: center; justify-content: center; min-width: 1.6rem; height: 1.6rem; padding: 0 .35rem; border-radius: 999px; background: #003060; color: #fff; }
+.rth-cal .c1 { grid-column-start: 1; } .rth-cal .c2 { grid-column-start: 2; } .rth-cal .c3 { grid-column-start: 3; }
+.rth-cal .c4 { grid-column-start: 4; } .rth-cal .c5 { grid-column-start: 5; } .rth-cal .c6 { grid-column-start: 6; } .rth-cal .c7 { grid-column-start: 7; }
+.rth-cal .w1 { grid-column-end: span 1; } .rth-cal .w2 { grid-column-end: span 2; } .rth-cal .w3 { grid-column-end: span 3; }
+.rth-cal .w4 { grid-column-end: span 4; } .rth-cal .w5 { grid-column-end: span 5; } .rth-cal .w6 { grid-column-end: span 6; } .rth-cal .w7 { grid-column-end: span 7; }
+.rth-cal .rth-cal-num.c1, .rth-cal .rth-cal-num.c2, .rth-cal .rth-cal-num.c3, .rth-cal .rth-cal-num.c4,
+.rth-cal .rth-cal-num.c5, .rth-cal .rth-cal-num.c6, .rth-cal .rth-cal-num.c7 { grid-row: 1; }
+
+.rth-cal .rth-cal-bar {
+  display: flex; align-items: center; gap: .3rem; min-width: 0; height: 1.5rem; padding: 0 .45rem; margin: 0 1px;
+  color: #fff; font-size: .75rem; line-height: 1; text-decoration: none; overflow: hidden; white-space: nowrap;
+  border-radius: 0; box-shadow: 0 1px 2px rgba(15, 23, 42, .15);
+}
+.rth-cal .rth-cal-bar.is-start { border-top-left-radius: 6px; border-bottom-left-radius: 6px; margin-left: 4px; }
+.rth-cal .rth-cal-bar.is-end { border-top-right-radius: 6px; border-bottom-right-radius: 6px; margin-right: 4px; }
+.rth-cal .rth-cal-bar:hover, .rth-cal .rth-cal-bar:focus-visible { color: #fff; filter: brightness(1.08); text-decoration: none; outline: 2px solid rgba(0, 48, 96, .45); outline-offset: 1px; }
+.rth-cal .rth-cal-bar .rth-cal-plane { width: .95rem; height: .95rem; flex: none; }
+.rth-cal .rth-cal-bar .rth-cal-cont { opacity: .7; flex: none; }
+.rth-cal .rth-cal-bar .rth-cal-label { overflow: hidden; text-overflow: ellipsis; flex: 1 1 auto; min-width: 0; }
+.rth-cal .rth-cal-bar .rth-cal-pax { flex: none; opacity: .85; font-size: .68rem; }
+.rth-cal .rth-cal-bar.w1 .rth-cal-pax { display: none; }
+
+.rth-cal .rth-cal-task {
+  display: flex; align-items: center; gap: .25rem; min-width: 0; height: 1.4rem; margin: 0 4px; padding: 0 .4rem;
+  border-radius: 6px; border: 1px solid #fed7aa; background: #fff7ed; color: #9a3412; font-size: .72rem; text-decoration: none; overflow: hidden; white-space: nowrap;
+}
+.rth-cal .rth-cal-task .icon { width: .85rem; height: .85rem; flex: none; }
+.rth-cal .rth-cal-task span { overflow: hidden; text-overflow: ellipsis; }
+.rth-cal a.rth-cal-task:hover { background: #ffedd5; color: #7c2d12; text-decoration: none; }
+
+.rth-cal .rth-cal-agenda-today { box-shadow: 0 0 0 2px #84a8cc; }
+.rth-cal .rth-cal-agenda .card-header { display: flex; align-items: center; }
+
+@media print {
+  .rth-cal .rth-cal-card { display: block !important; }
+  .rth-cal .rth-cal-agenda { display: none !important; }
+}
+
+/* Row action buttons (payments table) — never let flex squash them. */
+.rth-bookings .rth-bk-actions { flex-wrap: nowrap; }
+.rth-bookings .rth-bk-actions > *, .rth-bookings .rth-bk-actions .btn { flex: 0 0 auto; }
+.rth-bookings .rth-bk-actions form { margin: 0; }
+.rth-bookings .btn-sm.btn-icon { min-width: 2rem; justify-content: center; }

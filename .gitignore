@@ -54,3 +54,6 @@ backend/public/uploads/*
 
 # Packaged uploads (npm run backend:zip)
 /dist/
+
+# License signing keys (vendor only — NEVER commit)
+/license-keys/

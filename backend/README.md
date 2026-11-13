@@ -132,6 +132,17 @@ Example: a "Offers" module. Follow the FAQ module (`FaqController`, `FaqReposito
 8. **Check:** `php -l` on every new file, then click through list → create → invalid input (should redirect back with errors) → edit → delete.
    Watch `storage/logs/php-error.log` for warnings.
 
+## Travel suite: plans, roles and modules
+
+- **Plans**: `config/plans.php` maps each paid feature to Basic / Pro / Premium. A route with `'feature:quotations'`
+  shows the "Upgrade to unlock" screen when the plan lacks it. Use `feature('x')` in views. Keys: `docs/LICENSE-KEYS.md`.
+- **Roles**: `config/permissions.php` (owner, manager, sales, accounts, editor). Use the `'can:bookings'` middleware or `can('bookings')` in views.
+- **Sidebar**: `config/navigation.php`. **Business/billing settings**: `config/business.php` + `setting('key')`.
+- **Modules** register their routes in `app/routes/*.php` (auto-loaded) and their assets in `public/assets/admin/css|js/*` (auto-loaded).
+  Printable documents use `layouts/print.php`. Agent and developer conventions: `docs/ADMIN_SUITE_BRIEF.md`.
+- **Document numbers**: `Sequence::next('quotation'|'booking'|'invoice'|'receipt')` gives QT-2026-0001 and so on.
+- **Upgrading an existing database**: import `database/migrations/002_travel_suite.sql` once. Fresh installs use `schema.sql`.
+
 ## Security model
 
 | Threat | Defence |

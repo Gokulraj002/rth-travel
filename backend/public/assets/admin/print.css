@@ -1,0 +1,35 @@
+/* Printable A4 documents (quotations, invoices, receipts). Module-specific styles: assets/admin/css/doc-*.css */
+:root { --rth-navy: #0b1f3a; --rth-gold: #c8a24a; --rth-ink: #1f2937; --rth-muted: #6b7280; --rth-line: #e5e7eb; }
+body.rth-print { background: #eef1f5; color: var(--rth-ink); font-size: 14px; }
+.rth-print-toolbar { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid var(--rth-line); }
+.rth-print-toolbar-inner { max-width: 210mm; margin: 0 auto; padding: .6rem 1rem; display: flex; align-items: center; gap: .5rem; }
+.rth-print-page { padding: 1.5rem 1rem 3rem; }
+.rth-doc { background: #fff; max-width: 210mm; min-height: 297mm; margin: 0 auto; padding: 14mm 14mm 18mm; box-shadow: 0 10px 40px rgba(11, 31, 58, .12); border-radius: 4px; }
+.rth-doc-head { display: flex; justify-content: space-between; gap: 1.5rem; align-items: flex-start; border-bottom: 3px solid var(--rth-navy); padding-bottom: 1rem; margin-bottom: 1.25rem; }
+.rth-doc-brand { display: flex; gap: .85rem; align-items: center; }
+.rth-doc-brand img { width: 64px; height: auto; border-radius: 6px; }
+.rth-doc-brand .name { font-size: 1.35rem; font-weight: 800; color: var(--rth-navy); letter-spacing: .02em; line-height: 1.1; }
+.rth-doc-brand .meta { color: var(--rth-muted); font-size: .8rem; line-height: 1.45; }
+.rth-doc-title { text-align: right; }
+.rth-doc-title h1 { font-size: 1.5rem; margin: 0; color: var(--rth-navy); text-transform: uppercase; letter-spacing: .08em; }
+.rth-doc-title .no { font-weight: 700; }
+.rth-doc-title .meta { color: var(--rth-muted); font-size: .82rem; }
+.rth-doc h2, .rth-doc .rth-doc-section { font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--rth-gold); font-weight: 800; margin: 1.4rem 0 .5rem; }
+.rth-doc table.rth-doc-table { width: 100%; border-collapse: collapse; }
+.rth-doc table.rth-doc-table th { background: var(--rth-navy); color: #fff; font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; padding: .5rem .6rem; text-align: left; }
+.rth-doc table.rth-doc-table td { padding: .5rem .6rem; border-bottom: 1px solid var(--rth-line); vertical-align: top; }
+.rth-doc table.rth-doc-table .num { text-align: right; white-space: nowrap; }
+.rth-doc .rth-doc-totals { margin-left: auto; width: min(100%, 300px); }
+.rth-doc .rth-doc-totals div { display: flex; justify-content: space-between; padding: .3rem 0; }
+.rth-doc .rth-doc-totals .grand { border-top: 2px solid var(--rth-navy); margin-top: .3rem; padding-top: .5rem; font-size: 1.15rem; font-weight: 800; color: var(--rth-navy); }
+.rth-doc .rth-doc-foot { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--rth-line); color: var(--rth-muted); font-size: .8rem; }
+.rth-doc .rth-doc-box { border: 1px solid var(--rth-line); border-radius: 6px; padding: .75rem .9rem; }
+@media print {
+  @page { size: A4; margin: 10mm; }
+  body.rth-print { background: #fff; }
+  .rth-print-page { padding: 0; }
+  .rth-doc { box-shadow: none; max-width: none; min-height: 0; padding: 0; border-radius: 0; }
+  .rth-doc table.rth-doc-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rth-doc-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  a { color: inherit; text-decoration: none; }
+}

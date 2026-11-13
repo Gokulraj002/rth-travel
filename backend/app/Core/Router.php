@@ -8,7 +8,9 @@ namespace App\Core;
  * Tiny router with {param} placeholders and middleware.
  *   $r->get('/packages/{id}/edit', [PackageController::class, 'edit'], ['auth']);
  * Middleware: 'auth' (admin session), 'guest' (logged-out only), 'csrf' (auto on non-GET admin routes),
- * 'owner' (owner role), 'api' (JSON + CORS).
+ * 'owner' (owner role), 'api' (JSON + CORS),
+ * 'feature:quotations' (paid plan feature — shows the "Upgrade to unlock" page when the plan lacks it),
+ * 'can:bookings' (role permission — config/permissions.php).
  */
 final class Router
 {
@@ -94,6 +96,21 @@ final class Router
         }
         if (in_array('owner', $mw, true) && !Auth::isOwner()) {
             Response::abort(403, 'Only the account owner can do this.');
+        }
+        foreach ($mw as $m) {
+            if (str_starts_with($m, 'feature:')) {
+                $feature = substr($m, 8);
+                if (!License::has($feature)) {
+                    if ($method !== 'GET' && $method !== 'HEAD') {
+                        Response::abort(403, 'This feature needs the ' . License::planLabel(License::requiredPlan($feature)) . ' plan.');
+                    }
+                    http_response_code(200);
+                    echo View::render('admin/license/locked', ['title' => 'Upgrade to unlock', 'lockedFeature' => $feature]);
+                    exit;
+                }
+            } elseif (str_starts_with($m, 'can:')) {
+                Gate::authorize(substr($m, 4));
+            }
         }
         // CSRF for every state-changing admin request (API routes use their own protections).
         if (!$isApi && $method !== 'GET' && $method !== 'HEAD') {

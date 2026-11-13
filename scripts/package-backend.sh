@@ -58,6 +58,9 @@ done
 find "$B" \( -name '.DS_Store' -o -name '._*' -o -name '*.log' -o -name '*.swp' -o -name '*~' \) -type f -exec rm -f {} +
 find "$B" -type d \( -name '.git' -o -name 'node_modules' -o -name '.idea' -o -name '.vscode' \) -prune -exec rm -rf {} +
 
+# 4b. Vendor-only license tools never ship to client servers.
+rm -f "$B/bin/license-keypair.php" "$B/bin/license-generate.php"
+
 # 5. Sensible permissions for shared hosting: folders 755, files 644.
 find "$B" -type d -exec chmod 755 {} +
 find "$B" -type f -exec chmod 644 {} +

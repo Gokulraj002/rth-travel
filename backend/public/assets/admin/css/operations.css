@@ -1,0 +1,47 @@
+/* Operations module — vendors, vehicles, booking costs & profit. Scoped under .rth-ops / .rth-ops-panel. */
+
+/* Type tabs sit flush on top of the list card */
+.rth-ops .rth-ops-tabs { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; border-bottom: 0; }
+.rth-ops .rth-ops-tabs .nav-link { white-space: nowrap; display: inline-flex; align-items: center; }
+.rth-ops .rth-ops-tabcard { border-top-left-radius: 0; }
+
+/* Tables */
+.rth-ops .rth-ops-table td, .rth-ops-panel .rth-ops-table td { vertical-align: middle; }
+.rth-ops .rth-ops-inactive td, .rth-ops .rth-ops-inactive .card-body { opacity: .6; }
+.rth-ops .rth-ops-inactive.card { border-style: dashed; }
+.rth-ops-cancelled td { opacity: .55; }
+.rth-ops-cancelled td .fw-semibold, .rth-ops-cancelled td:nth-child(4) { text-decoration: line-through; }
+.rth-ops .rth-ops-table tfoot td, .rth-ops-panel .rth-ops-table tfoot td { border-top: 2px solid var(--tblr-border-color, #e6e7e9); }
+
+/* Profile definition list */
+.rth-ops .rth-ops-dl { display: grid; grid-template-columns: 7.5rem 1fr; gap: .5rem .75rem; margin: 0; }
+.rth-ops .rth-ops-dl dt { font-weight: 500; color: var(--tblr-secondary, #667382); }
+.rth-ops .rth-ops-dl dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.rth-ops .rth-ops-pre { white-space: pre-line; }
+
+/* Vehicle cards */
+.rth-ops .rth-ops-vehicle .card-title a { text-decoration: none; }
+.rth-ops .rth-ops-reg { font-family: var(--tblr-font-monospace, monospace); letter-spacing: .02em; }
+.rth-ops .rth-ops-expiry { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .3rem 0; border-top: 1px dashed var(--tblr-border-color, #e6e7e9); }
+.rth-ops .rth-ops-expiry .badge { white-space: normal; text-align: right; }
+.rth-ops .min-w-0 { min-width: 0; }
+
+/* Costs & profit panel */
+.rth-ops-panel .rth-ops-services td:first-child { min-width: 14rem; }
+.rth-ops-panel .rth-ops-services td:nth-child(2) { min-width: 10rem; }
+.rth-ops-panel .rth-ops-totals .h3 { display: inline-flex; align-items: center; gap: .25rem; }
+.rth-ops-panel .rth-ops-add > summary { list-style: none; display: inline-flex; align-items: center; gap: .25rem; }
+.rth-ops-panel .rth-ops-add > summary::-webkit-details-marker { display: none; }
+.rth-ops-panel .rth-ops-add[open] > summary { opacity: .75; }
+[data-ops-service-form] [hidden] { display: none !important; }
+
+@media (max-width: 575.98px) {
+  .rth-ops .rth-ops-dl { grid-template-columns: 1fr; gap: .1rem; }
+  .rth-ops .rth-ops-dl dd { margin-bottom: .5rem; }
+}
+
+/* Icon buttons (call / WhatsApp) must never be squeezed by flex rows */
+.rth-ops .btn-icon, .rth-ops-panel .btn-icon { flex-shrink: 0; }
+.rth-ops .rth-ops-driver .ms-auto { flex-shrink: 0; }
+.rth-ops .btn-icon .icon, .rth-ops-panel .btn-icon .icon { margin: 0; }
+.rth-ops .btn-sm.btn-icon, .rth-ops-panel .btn-sm.btn-icon { min-width: 1.875rem; padding-left: .3rem; padding-right: .3rem; justify-content: center; }

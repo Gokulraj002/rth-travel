@@ -102,7 +102,11 @@ The `backend.zip` package contains two files in its `database` folder. You can a
 3. Click the **Import** tab at the top.
 4. Click **Choose file**, select **`schema.sql`**, then click **Import** (or **Go**) at the bottom. Wait for the green success message.
 5. Repeat for **`seed.sql`**. Order matters: **`schema.sql` first, then `seed.sql`**.
-6. Click the database name again. You should see about 16 tables, including `packages`, `destinations` and `enquiries`.
+6. Click the database name again. You should see about 32 tables, including `packages`, `customers`, `bookings` and `invoices`.
+
+> **Already using an older admin panel (before the travel suite)?** Do **not** import `schema.sql` again. Back up the
+> database (Export), then import only **`database/migrations/002_travel_suite.sql`**, **once**. It adds the new tables
+> (customers, quotations, bookings, payments, invoices, vendors …) and keeps all your existing content.
 
 > Warning: `schema.sql` **deletes and recreates** the tables. Only import it on a new, empty database, and never
 > on the live database once you have started using the admin panel.
@@ -193,6 +197,10 @@ Open these addresses in your browser — each must show **Not Found / Forbidden*
 | `UPLOAD_MAX_MB` | The largest photo you can upload, in MB. Keep it **below** the PHP upload limit set in B6. | `8` |
 | `ENQUIRY_NOTIFY_EMAIL` | Optional. An email address that receives a message for every new enquiry. Leave empty for none. | `bookings@yourdomain.com` |
 | `MAIL_FROM` | The sender address for those emails. It should be an address on your domain. | `no-reply@yourdomain.com` |
+| `LICENSE_VENDOR_NAME` | Who sells upgrades (shown on "Upgrade to unlock" screens). Filled in by your developer. | `Your developer's name` |
+| `LICENSE_VENDOR_WHATSAPP` | WhatsApp number for upgrade requests, with country code. | `919876543210` |
+| `LICENSE_VENDOR_EMAIL` | Email for upgrade requests. | |
+| `LICENSE_DEV_PLAN` | Leave **empty** on Hostinger (it only works on a developer's computer). | |
 
 > **Keep `.env` private.** Never email it, share a screenshot of it, or upload it to GitHub. It holds your database password and secrets.
 
@@ -218,6 +226,7 @@ On Hostinger the website runs as your own user, so **755** is enough. Never use 
    - `fileinfo`: checks that uploads really are images
    - `curl`: lets the admin panel refresh the website
    - `mbstring`: handles text in any language
+   - `sodium`: checks Pro / Premium license keys
 4. **PHP options** tab: set these values, then **Save**:
    - `upload_max_filesize` = **10M**
    - `post_max_size` = **12M**
@@ -381,8 +390,15 @@ doesn't seem to appear. (The website also refreshes itself every few minutes as 
 4. Restoring a backup **overwrites** what's there now, so download a fresh copy first.
 5. Keep a copy of your `.env` in your password manager (not in email).
 
+**Plans (Basic, Pro, Premium):** the admin panel starts on **Basic** (website manager). Pro adds customers, the lead
+pipeline, quotations, bookings, payments, the trip calendar and reports. Premium adds GST invoices, vendors, vehicles,
+profit per booking, staff roles, message templates, the activity log and backups. After payment you receive a
+**license key**: open **Plan & upgrade** in the admin sidebar, paste it and click **Activate**. Features unlock
+immediately, and no data is ever deleted when a plan changes. Full guide for the team: `docs/ADMIN-USER-GUIDE.md`.
+
 **Updating the admin software** (when your developer sends a new `backend.zip`): back up first, then upload and extract
 it into the same `domains/admin.yourdomain.com` folder, overwriting the existing files. Your `.env`, uploaded photos and logs are not in the zip, so they are kept.
+If the update notes mention a new file in `database/migrations/`, import that file once in phpMyAdmin (after the backup).
 
 ---
 

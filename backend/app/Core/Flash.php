@@ -10,6 +10,7 @@ final class Flash
     public static function success(string $msg): void { self::add('success', $msg); }
     public static function error(string $msg): void { self::add('danger', $msg); }
     public static function info(string $msg): void { self::add('info', $msg); }
+    public static function warning(string $msg): void { self::add('warning', $msg); }
 
     private static function add(string $type, string $msg): void
     {

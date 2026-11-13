@@ -1,0 +1,55 @@
+/* GST tax invoice print layout (admin/invoices/print.php). Scoped under .rth-inv-doc. */
+.rth-inv-doc { position: relative; font-size: 12.5px; }
+.rth-inv-doc .rth-doc-brand { align-items: flex-start; }
+.rth-inv-doc .rth-inv-ids { margin-top: .35rem; display: flex; flex-wrap: wrap; gap: .15rem .9rem; font-size: .78rem; color: var(--rth-ink); }
+.rth-inv-doc .rth-doc-title h1 { font-size: 1.45rem; }
+.rth-inv-doc .rth-inv-meta { margin: .5rem 0 0 auto; border-collapse: collapse; font-size: .8rem; }
+.rth-inv-doc .rth-inv-meta th { text-align: left; font-weight: 600; color: var(--rth-muted); padding: .1rem .6rem .1rem 0; white-space: nowrap; }
+.rth-inv-doc .rth-inv-meta td { text-align: right; padding: .1rem 0; white-space: nowrap; }
+.rth-inv-doc .rth-inv-meta td.no { font-weight: 800; color: var(--rth-navy); font-size: .95rem; }
+.rth-inv-doc .rth-inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: 1rem; }
+.rth-inv-doc .rth-inv-parties .rth-doc-section { margin-top: 0; }
+.rth-inv-doc .rth-inv-parties > div { line-height: 1.5; }
+.rth-inv-doc .rth-inv-table th small { font-weight: 400; text-transform: none; opacity: .85; }
+.rth-inv-doc .rth-inv-table td { font-size: .8rem; padding: .45rem .5rem; }
+.rth-inv-doc .rth-inv-table th { padding: .45rem .5rem; font-size: .7rem; }
+.rth-inv-doc .rth-inv-table tfoot td { font-weight: 800; border-top: 2px solid var(--rth-navy); border-bottom: 0; background: #f8fafc; }
+.rth-inv-doc .rth-inv-bottom { display: grid; grid-template-columns: 1fr minmax(240px, 300px); gap: 1.25rem; margin-top: 1rem; align-items: start; }
+.rth-inv-doc .rth-inv-bottom .rth-doc-totals { width: 100%; }
+.rth-inv-doc .rth-inv-words .rth-doc-section:first-child, .rth-inv-doc .rth-inv-foot-grid .rth-doc-section:first-child { margin-top: 0; }
+.rth-inv-doc .rth-inv-foot-grid { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--rth-line); }
+.rth-inv-doc .rth-inv-bank { line-height: 1.55; }
+.rth-inv-doc .rth-inv-terms { padding-left: 1.1rem; margin: 0; color: var(--rth-muted); font-size: .78rem; }
+.rth-inv-doc .rth-inv-sign { text-align: right; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px; }
+.rth-inv-doc .rth-inv-sign-space { flex: 1; min-height: 56px; }
+.rth-inv-doc .rth-inv-sign-name { border-top: 1px solid var(--rth-ink); padding-top: .3rem; margin-left: auto; min-width: 180px; text-align: center; font-weight: 600; }
+.rth-inv-doc .rth-inv-stamp {
+  position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%) rotate(-24deg);
+  font-size: 7rem; font-weight: 900; letter-spacing: .15em; color: rgba(220, 38, 38, .13);
+  border: 10px solid rgba(220, 38, 38, .13); padding: 0 2rem; border-radius: 12px; pointer-events: none; z-index: 0;
+}
+.rth-inv-doc.is-draft .rth-inv-stamp { color: rgba(107, 114, 128, .14); border-color: rgba(107, 114, 128, .14); }
+@media (max-width: 640px) {
+  .rth-inv-doc .rth-doc-head { flex-direction: column; }
+  .rth-inv-doc .rth-doc-title { text-align: left; }
+  .rth-inv-doc .rth-inv-meta { margin-left: 0; }
+  .rth-inv-doc .rth-inv-parties, .rth-inv-doc .rth-inv-bottom { grid-template-columns: 1fr; }
+  .rth-inv-doc .rth-inv-table { display: block; overflow-x: auto; }
+}
+@media print {
+  .rth-inv-doc { font-size: 11.5px; }
+  .rth-inv-doc .rth-inv-table tfoot td, .rth-inv-doc .rth-inv-stamp { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rth-inv-doc .rth-inv-table tr, .rth-inv-doc .rth-inv-foot-grid { break-inside: avoid; }
+}
+.rth-inv-doc .rth-inv-table td:nth-child(2) { min-width: 190px; }
+
+/* Keep the GST table inside the A4 page: 8 columns need tighter cells than the default document table. */
+.rth-inv-doc .rth-inv-table { width: 100%; table-layout: auto; }
+.rth-inv-doc .rth-inv-table th,
+.rth-inv-doc .rth-inv-table td { padding: .4rem .35rem; font-size: .78rem; }
+.rth-inv-doc .rth-inv-table th:first-child,
+.rth-inv-doc .rth-inv-table td:first-child { padding-left: .5rem; width: 1%; }
+.rth-inv-doc .rth-inv-table th:last-child,
+.rth-inv-doc .rth-inv-table td:last-child { padding-right: .5rem; }
+.rth-inv-doc .rth-inv-table td:nth-child(2) { min-width: 0; width: 38%; }
+.rth-inv-doc .rth-inv-table .num { white-space: nowrap; }

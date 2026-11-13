@@ -3,8 +3,11 @@
  * @var array{q:string,status:string,from:string,to:string} $filters
  * @var array{rows:list<array<string,mixed>>,total:int,page:int,pages:int,perPage:int} $result
  * @var int $newCount
+ * @var bool $crm  plan has the lead pipeline → show stage + follow-up
  */
 use App\Repositories\EnquiryRepository as Enq;
+
+$crm = $crm ?? false;
 
 $activeFilters = array_filter($filters, static fn ($v) => $v !== '');
 $qs = static function (array $extra = []) use ($activeFilters): string {
@@ -25,6 +28,17 @@ $to = min($result['total'], $result['page'] * $result['perPage']);
           <input type="search" id="f-q" name="q" class="form-control" value="<?= e($filters['q']) ?>" placeholder="Name, phone, email or message">
         </div>
       </div>
+      <?php if ($crm): ?>
+      <div class="col-6 col-md-2">
+        <label class="form-label" for="f-stage">Stage</label>
+        <select id="f-stage" name="stage" class="form-select">
+          <option value="">All</option>
+          <?php foreach (Enq::stages() as $key => $st): ?>
+            <option value="<?= e($key) ?>"<?= ($filters['stage'] ?? '') === $key ? ' selected' : '' ?>><?= e($st['label']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <?php else: ?>
       <div class="col-6 col-md-2">
         <label class="form-label" for="f-status">Status</label>
         <select id="f-status" name="status" class="form-select">
@@ -34,6 +48,7 @@ $to = min($result['total'], $result['page'] * $result['perPage']);
           <?php endforeach; ?>
         </select>
       </div>
+      <?php endif; ?>
       <div class="col-6 col-md-2">
         <label class="form-label" for="f-from">From</label>
         <input type="date" id="f-from" name="from" class="form-control" value="<?= e($filters['from']) ?>">
@@ -64,6 +79,7 @@ $to = min($result['total'], $result['page'] * $result['perPage']);
         <?php else: ?>
           <p class="empty-title">No enquiries yet</p>
           <p class="empty-subtitle text-secondary">When someone fills in the enquiry form on your website, it will appear here — with buttons to call or WhatsApp them.</p>
+          <?php if ($crm): ?><div class="empty-action"><a href="<?= e(url('/enquiries/create')) ?>" class="btn btn-primary"><?= icon('plus') ?> Add a phone or walk-in enquiry</a></div><?php endif; ?>
         <?php endif; ?>
       </div>
     </div>
@@ -80,7 +96,8 @@ $to = min($result['total'], $result['page'] * $result['perPage']);
             <th>Trip</th>
             <th>Travellers</th>
             <th>Source</th>
-            <th>Status</th>
+            <th><?= $crm ? 'Stage' : 'Status' ?></th>
+            <?php if ($crm): ?><th>Follow-up</th><?php endif; ?>
             <th>Received</th>
             <th class="w-1"></th>
           </tr>
@@ -102,7 +119,12 @@ $to = min($result['total'], $result['page'] * $result['perPage']);
               </td>
               <td class="text-nowrap"><?= e(Enq::people($r)) ?></td>
               <td class="text-secondary text-nowrap"><?= e(Enq::sourceLabel($r['source'])) ?></td>
-              <td><span class="badge <?= e(Enq::statusClass((string) $r['status'])) ?>"><?= e(Enq::statusLabel((string) $r['status'])) ?></span></td>
+              <?php if ($crm): ?>
+                <td><?= status_badge((string) $r['stage'], Enq::stageLabel((string) $r['stage'])) ?><?php if ($r['priority'] === 'high'): ?> <span class="badge bg-red-lt" title="High priority">!</span><?php endif; ?></td>
+                <td class="small text-nowrap<?= Enq::followUpOverdue($r) ? ' text-danger fw-semibold' : ' text-secondary' ?>"><?= $r['next_follow_up_at'] && !in_array($r['stage'], ['won', 'lost'], true) ? e(nice_date($r['next_follow_up_at'])) : '—' ?></td>
+              <?php else: ?>
+                <td><span class="badge <?= e(Enq::statusClass((string) $r['status'])) ?>"><?= e(Enq::statusLabel((string) $r['status'])) ?></span></td>
+              <?php endif; ?>
               <td class="text-secondary small text-nowrap"><?= e(nice_date($r['created_at'])) ?></td>
               <td><a href="<?= e(url('/enquiries/' . $r['id'])) ?>" class="btn btn-sm">Open</a></td>
             </tr>

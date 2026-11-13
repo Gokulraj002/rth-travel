@@ -1,0 +1,58 @@
+/* Accounts module: business details, GST invoices, reports. Scoped to module classes. */
+
+/* Status badges used by invoices (generic ones may also live in app.css). */
+.rth-status-issued { background: #e0ecff; color: #1d4ed8; }
+.rth-status-paid { background: #dcfce7; color: #15803d; }
+.rth-status-void { background: #fee2e2; color: #b91c1c; }
+.rth-status-draft { background: #f1f5f9; color: #475569; }
+
+/* Business details */
+.rth-business .rth-acc-preview { background: var(--tblr-bg-surface-secondary, #f6f8fb); border-radius: 8px; padding: .65rem .8rem; }
+.rth-business .rth-acc-preview .badge { font-size: .78rem; font-weight: 500; }
+.rth-business input[data-acc-upper] { text-transform: uppercase; }
+
+/* Invoice form */
+.rth-inv-form .rth-inv-line { padding: .6rem; border: 1px solid var(--tblr-border-color, #e6e7e9); border-radius: 8px; background: var(--tblr-bg-surface, #fff); }
+.rth-inv-form [data-acc-amount] { white-space: nowrap; }
+.rth-inv-form input[data-acc-upper] { text-transform: uppercase; }
+.rth-inv-form .rth-acc-booking { background: var(--tblr-bg-surface-secondary, #f6f8fb); border-radius: 8px; padding: .65rem .8rem; }
+.rth-inv-form .rth-inv-summary .card-body > div { padding: .15rem 0; }
+.rth-inv-form [data-acc-intra][hidden], .rth-inv-form [data-acc-inter][hidden] { display: none !important; }
+@media (min-width: 992px) { .rth-inv-form .rth-inv-summary { position: sticky; top: 1rem; } }
+
+/* Invoice show + lists */
+.rth-inv-totals { width: min(100%, 340px); }
+.rth-inv-totals > div { display: flex; justify-content: space-between; gap: 1rem; padding: .2rem 0; }
+.rth-inv-totals .grand { border-top: 2px solid currentColor; margin-top: .3rem; padding-top: .45rem; font-weight: 800; font-size: 1.1rem; }
+.rth-invoices tr.rth-inv-void td, .rth-inv-panel .rth-inv-void .fw-semibold { text-decoration: line-through; opacity: .65; }
+
+/* Reports */
+.rth-reports .rth-rep-kpi .h2 { margin: 0; }
+.rth-reports .nav-tabs { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+.rth-reports .nav-tabs .nav-link { white-space: nowrap; }
+.rth-reports [data-acc-custom][hidden] { display: none !important; }
+.rth-reports .rth-chart { display: block; max-width: 100%; }
+.rth-reports .rth-chart-bar { fill: var(--tblr-primary, #206bc4); }
+.rth-reports .rth-chart-bar2 { fill: #c8a24a; }
+.rth-reports .rth-chart-grid { stroke: var(--tblr-border-color, #e6e7e9); stroke-width: 1; }
+.rth-reports .rth-chart-label { fill: var(--tblr-secondary, #6b7280); font-size: 11px; }
+.rth-reports .rth-chart-track { stroke: var(--tblr-border-color, #eef0f3); }
+.rth-reports .rth-donut { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.rth-reports .rth-donut svg { width: 170px; height: 170px; flex: none; }
+.rth-reports .rth-donut-total { font-size: 15px; font-weight: 800; fill: currentColor; }
+.rth-reports .rth-donut-legend { list-style: none; padding: 0; margin: 0; flex: 1; min-width: 160px; font-size: .85rem; }
+.rth-reports .rth-donut-legend li { display: flex; align-items: center; gap: .45rem; padding: .15rem 0; }
+.rth-reports .rth-donut-legend strong { margin-left: auto; }
+.rth-reports .rth-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.rth-reports .rth-chart-legend { display: flex; gap: 1rem; font-size: .8rem; color: var(--tblr-secondary, #6b7280); margin-top: .35rem; }
+.rth-reports .rth-chart-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.rth-reports circle.rth-chart-c0 { stroke: #206bc4; } .rth-reports .rth-dot.rth-chart-c0 { background: #206bc4; }
+.rth-reports circle.rth-chart-c1 { stroke: #c8a24a; } .rth-reports .rth-dot.rth-chart-c1 { background: #c8a24a; }
+.rth-reports circle.rth-chart-c2 { stroke: #2fb344; } .rth-reports .rth-dot.rth-chart-c2 { background: #2fb344; }
+.rth-reports circle.rth-chart-c3 { stroke: #d63939; } .rth-reports .rth-dot.rth-chart-c3 { background: #d63939; }
+.rth-reports circle.rth-chart-c4 { stroke: #ae3ec9; } .rth-reports .rth-dot.rth-chart-c4 { background: #ae3ec9; }
+.rth-reports circle.rth-chart-c5 { stroke: #17a2b8; } .rth-reports .rth-dot.rth-chart-c5 { background: #17a2b8; }
+.rth-reports circle.rth-chart-c6 { stroke: #f76707; } .rth-reports .rth-dot.rth-chart-c6 { background: #f76707; }
+.rth-reports circle.rth-chart-c7 { stroke: #0b1f3a; } .rth-reports .rth-dot.rth-chart-c7 { background: #0b1f3a; }
+.rth-reports .rth-rep-bar { height: 6px; border-radius: 3px; background: var(--tblr-primary, #206bc4); opacity: .75; }
+.rth-reports .text-loss { color: #d63939; }
